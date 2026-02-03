@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Sparkles, Send, Mic, Image as ImageIcon, Zap } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
@@ -194,7 +194,7 @@ export default function PromptPage() {
 			transition: {
 				duration: 1,
 				delay: 0.5 + i * 0.2,
-				ease: [0.25, 0.4, 0.25, 1],
+				ease: [0.25, 0.4, 0.25, 1] as const,
 			},
 		}),
 	};
