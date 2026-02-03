@@ -4,78 +4,26 @@ import { motion } from 'framer-motion';
 import { Sparkles, Send, Mic, Image as ImageIcon, Zap } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { ElegantShape } from '@/components/ElegantShape';
 
-function ElegantShape({
-	className,
-	delay = 0,
-	width = 400,
-	height = 100,
-	rotate = 0,
-	gradient = 'from-white/[0.08]',
-}: {
-	className?: string;
-	delay?: number;
-	width?: number;
-	height?: number;
-	rotate?: number;
-	gradient?: string;
-}) {
-	return (
-		<motion.div
-			initial={{
-				opacity: 0,
-				y: -150,
-				rotate: rotate - 15,
-			}}
-			animate={{
-				opacity: 1,
-				y: 0,
-				rotate: rotate,
-			}}
-			transition={{
-				duration: 2.4,
-				delay,
-				ease: [0.23, 0.86, 0.39, 0.96],
-				opacity: { duration: 1.2 },
-			}}
-			className={cn('absolute', className)}
-		>
-			<motion.div
-				animate={{
-					y: [0, 15, 0],
-				}}
-				transition={{
-					duration: 12,
-					repeat: Number.POSITIVE_INFINITY,
-					ease: 'easeInOut',
-				}}
-				style={{
-					width,
-					height,
-				}}
-				className="relative"
-			>
-				<div
-					className={cn(
-						'absolute inset-0 rounded-full',
-						'bg-gradient-to-r to-transparent',
-						gradient,
-						'backdrop-blur-[2px] border-2 border-white/[0.15]',
-						'shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]',
-						'after:absolute after:inset-0 after:rounded-full',
-						'after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]',
-					)}
-				/>
-			</motion.div>
-		</motion.div>
-	);
-}
-
+/**
+ * Props for the PromptInput component
+ */
 interface PromptInputProps {
 	onSend?: (message: string) => void;
 	placeholder?: string;
 }
 
+/**
+ * PromptInput Component
+ *
+ * A rich text input area for users to describe their tattoo ideas.
+ * Features:
+ * - Auto-expanding textarea
+ * - Send button (disabled when empty)
+ * - Placeholder for voice and image input triggers
+ * - Glassmorphism styling
+ */
 function PromptInput({
 	onSend = () => {},
 	placeholder = 'Describe your dream tattoo...',
@@ -87,6 +35,7 @@ function PromptInput({
 		if (input.trim()) {
 			onSend(input);
 			setInput('');
+			// Reset height after sending
 			if (textareaRef.current) {
 				textareaRef.current.style.height = 'auto';
 			}
@@ -100,6 +49,7 @@ function PromptInput({
 		}
 	};
 
+	// Auto-resize textarea based on content
 	useEffect(() => {
 		if (textareaRef.current) {
 			textareaRef.current.style.height = 'auto';
@@ -124,17 +74,20 @@ function PromptInput({
 					/>
 				</div>
 
+				{/* Input Actions Footer */}
 				<div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
 					<div className="flex items-center gap-2">
 						<button
 							type="button"
 							className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
+							aria-label="Upload Image"
 						>
 							<ImageIcon className="h-5 w-5" />
 						</button>
 						<button
 							type="button"
 							className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
+							aria-label="Use Microphone"
 						>
 							<Mic className="h-5 w-5" />
 						</button>
@@ -149,12 +102,14 @@ function PromptInput({
 								? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg'
 								: 'bg-white/10 text-white/40 cursor-not-allowed',
 						)}
+						aria-label="Send Prompt"
 					>
 						<Send className="h-4 w-4" />
 					</button>
 				</div>
 			</div>
 
+			{/* Quick Suggestions / Tags */}
 			<div className="flex items-center justify-center gap-3 mt-6 flex-wrap">
 				<QuickPrompt
 					icon={<Sparkles className="w-4 h-4" />}
@@ -170,6 +125,11 @@ function PromptInput({
 	);
 }
 
+/**
+ * QuickPrompt Component
+ *
+ * Renders a pill-shaped button for quick selection of prompt styles or tags.
+ */
 function QuickPrompt({
 	icon,
 	label,
@@ -185,7 +145,14 @@ function QuickPrompt({
 	);
 }
 
+/**
+ * PromptPage Component
+ *
+ * The main landing page for the AI Tattoo Design application.
+ * Composes the layout with background animations, title, and the main input area.
+ */
 export default function PromptPage() {
+	// Animation variants for the staggered fade-up effect
 	const fadeUpVariants = {
 		hidden: { opacity: 0, y: 30 },
 		visible: (i: number) => ({
@@ -201,8 +168,10 @@ export default function PromptPage() {
 
 	return (
 		<div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#030303]">
+			{/* Background Ambient Gradient */}
 			<div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.05] via-transparent to-pink-500/[0.05] blur-3xl" />
 
+			{/* Floating Background Shapes */}
 			<div className="absolute inset-0 overflow-hidden">
 				<ElegantShape
 					delay={0.3}
@@ -241,8 +210,10 @@ export default function PromptPage() {
 				/>
 			</div>
 
+			{/* Main Content Container */}
 			<div className="relative z-10 container mx-auto px-4 md:px-6">
 				<div className="max-w-5xl mx-auto text-center">
+					{/* Header Badge */}
 					<motion.div
 						custom={0}
 						variants={fadeUpVariants}
@@ -256,6 +227,7 @@ export default function PromptPage() {
 						</span>
 					</motion.div>
 
+					{/* Main Title */}
 					<motion.div
 						custom={1}
 						variants={fadeUpVariants}
@@ -273,6 +245,7 @@ export default function PromptPage() {
 						</h1>
 					</motion.div>
 
+					{/* Description Text */}
 					<motion.div
 						custom={2}
 						variants={fadeUpVariants}
@@ -285,6 +258,7 @@ export default function PromptPage() {
 						</p>
 					</motion.div>
 
+					{/* Interactive Prompt Input */}
 					<motion.div
 						custom={3}
 						variants={fadeUpVariants}
@@ -294,6 +268,7 @@ export default function PromptPage() {
 						<PromptInput />
 					</motion.div>
 
+					{/* Footer Stats / Trust Indicators */}
 					<motion.div
 						custom={4}
 						variants={fadeUpVariants}
@@ -313,6 +288,7 @@ export default function PromptPage() {
 				</div>
 			</div>
 
+			{/* Bottom Overlay for depth */}
 			<div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-[#030303]/80 pointer-events-none" />
 		</div>
 	);
