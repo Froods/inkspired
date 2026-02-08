@@ -1,8 +1,7 @@
-// server/server.ts
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
 dotenv.config();
 
@@ -18,10 +17,10 @@ if (!apiKey) {
 	process.exit(1);
 }
 
-const genAI = new GoogleGenerativeAI(apiKey);
+// Initialize the new client
+const ai = new GoogleGenAI({ apiKey });
 
-// The premium model for Image Generation
-// If this still gives 404, we will try 'image-generation-001'
+// Use Imagen 4 as per latest documentation
 const MODEL_NAME = 'imagen-3.0-generate-001';
 
 interface GenerateRequest {
@@ -41,30 +40,43 @@ app.post(
 
 			console.log(`🎨 Generating Pro Tattoo for: "${prompt}"...`);
 
-			const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+			// Call the API using the new SDK method for image generation
+            // According to the docs:
+            // const response = await ai.models.generateImages({
+            //   model: 'imagen-4.0-generate-001',
+            //   prompt: 'Robot holding a red skateboard',
+            //   config: { numberOfImages: 1 },
+            // });
 
-			// Call the API
-			const result = await model.generateContent({
-				contents: [{ role: 'user', parts: [{ text: prompt }] }],
+			const response = await ai.models.generateImages({
+				model: MODEL_NAME,
+				prompt: prompt,
+                config: {
+                    numberOfImages: 1,
+                    aspectRatio: "1:1"
+                }
 			});
 
-			const response = result.response;
-
-			// Safety checks for the response structure
-			if (!response.candidates || response.candidates.length === 0) {
+			if (!response.generatedImages || response.generatedImages.length === 0) {
 				throw new Error('No image generated.');
 			}
 
-			const imagePart = response.candidates[0].content.parts[0];
+			const generatedImage = response.generatedImages[0];
+            const imageBytes = generatedImage.image?.imageBytes;
 
-			if (!imagePart.inlineData) {
-				throw new Error('API returned text instead of image.');
-			}
+            if (!imageBytes) {
+                throw new Error('No image bytes returned.');
+            }
 
-			const base64Image = imagePart.inlineData.data;
-			const mimeType = imagePart.inlineData.mimeType || 'image/jpeg';
+            // Convert to base64 for frontend display
+            // The SDK returns base64 string in imageBytes according to some docs, or Uint8Array?
+            // The docs example:
+            // let imgBytes = generatedImage.image.imageBytes;
+            // const buffer = Buffer.from(imgBytes, "base64");
+            // So imgBytes is a base64 string.
 
-			const dataUrl = `data:${mimeType};base64,${base64Image}`;
+			const mimeType = 'image/png'; // Imagen usually returns PNG
+			const dataUrl = `data:${mimeType};base64,${imageBytes}`;
 
 			console.log('✅ Image generated successfully!');
 			res.json({ success: true, imageUrl: dataUrl });
