@@ -21,7 +21,7 @@ if (!apiKey) {
 const ai = new GoogleGenAI({ apiKey });
 
 // Use Imagen 4 as per latest documentation
-const MODEL_NAME = 'imagen-3.0-generate-001';
+const MODEL_NAME = 'imagen-4.0-generate-001';
 
 interface GenerateRequest {
 	prompt: string;
@@ -41,20 +41,20 @@ app.post(
 			console.log(`🎨 Generating Pro Tattoo for: "${prompt}"...`);
 
 			// Call the API using the new SDK method for image generation
-            // According to the docs:
-            // const response = await ai.models.generateImages({
-            //   model: 'imagen-4.0-generate-001',
-            //   prompt: 'Robot holding a red skateboard',
-            //   config: { numberOfImages: 1 },
-            // });
+			// According to the docs:
+			// const response = await ai.models.generateImages({
+			//   model: 'imagen-4.0-generate-001',
+			//   prompt: 'Robot holding a red skateboard',
+			//   config: { numberOfImages: 1 },
+			// });
 
 			const response = await ai.models.generateImages({
 				model: MODEL_NAME,
 				prompt: prompt,
-                config: {
-                    numberOfImages: 1,
-                    aspectRatio: "1:1"
-                }
+				config: {
+					numberOfImages: 1,
+					aspectRatio: '1:1',
+				},
 			});
 
 			if (!response.generatedImages || response.generatedImages.length === 0) {
@@ -62,18 +62,18 @@ app.post(
 			}
 
 			const generatedImage = response.generatedImages[0];
-            const imageBytes = generatedImage.image?.imageBytes;
+			const imageBytes = generatedImage.image?.imageBytes;
 
-            if (!imageBytes) {
-                throw new Error('No image bytes returned.');
-            }
+			if (!imageBytes) {
+				throw new Error('No image bytes returned.');
+			}
 
-            // Convert to base64 for frontend display
-            // The SDK returns base64 string in imageBytes according to some docs, or Uint8Array?
-            // The docs example:
-            // let imgBytes = generatedImage.image.imageBytes;
-            // const buffer = Buffer.from(imgBytes, "base64");
-            // So imgBytes is a base64 string.
+			// Convert to base64 for frontend display
+			// The SDK returns base64 string in imageBytes according to some docs, or Uint8Array?
+			// The docs example:
+			// let imgBytes = generatedImage.image.imageBytes;
+			// const buffer = Buffer.from(imgBytes, "base64");
+			// So imgBytes is a base64 string.
 
 			const mimeType = 'image/png'; // Imagen usually returns PNG
 			const dataUrl = `data:${mimeType};base64,${imageBytes}`;
