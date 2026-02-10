@@ -35,8 +35,7 @@ app.post(
 			const { prompt } = req.body;
 
 			if (!prompt) {
-				res.status(400).json({ error: 'Prompt is required' });
-				return;
+				return res.status(400).json({ error: 'Prompt is required' });
 			}
 
 			console.log(`🎨 Generating Pro Tattoo for: "${prompt}"...`);

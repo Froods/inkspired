@@ -22,7 +22,6 @@ interface PromptInputProps {
  * - Auto-expanding textarea
  * - Send button (disabled when empty)
  * - Placeholder for voice and image input triggers
- * - Glassmorphism styling
  */
 function PromptInput({
 	onSend = () => {},
