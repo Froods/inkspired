@@ -16,15 +16,17 @@ export default function GeneratedTattooDisplay({
 	return (
 		<dialog
 			open={isOpen}
-			className="bg-gray-800 border border-white/10 backdrop:bg-black/80 fixed inset-0 z-50 m-auto w-6/12 max-w-screen-lg h-4/5 p-4 rounded-2xl"
+			className="bg-white/5 backdrop-blur-xl border border-white/20 fixed inset-0 z-50 m-auto w-full max-w-3xl min-h-[50vh] max-h-[85vh] p-8 rounded-3xl shadow-2xl shadow-black/50 backdrop:bg-black/60 transition-all duration-300"
 		>
-			<div className="flex flex-row justify-end pr-1 pt-1">
-				<div
+			<div className="flex flex-row justify-end pr-1 pt-1 absolute top-4 right-4 z-10">
+				<button
+					type="button"
 					onClick={onClose}
-					className="rounded-full bg-gray-500 p-0.5 hover:bg-gray-400 hover:cursor-pointer"
+					className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
+					aria-label="Close"
 				>
-					<X strokeWidth={2.75} className="h-4 w-4 text-gray-800"></X>
-				</div>
+					<X strokeWidth={2.5} className="h-5 w-5" />
+				</button>
 			</div>
 			<div className="flex flex-col items-center justify-evenly w-full h-full">
 				{/* Loading State */}
@@ -44,7 +46,7 @@ export default function GeneratedTattooDisplay({
 
 				{/* The Generated Tattoo */}
 				{imageStatus && (
-					<div className="relative group rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-w-md">
+					<div className="relative group rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-w-md w-full">
 						<img
 							src={imageStatus}
 							alt="Generated Tattoo"
@@ -55,7 +57,7 @@ export default function GeneratedTattooDisplay({
 							<a
 								href={imageStatus}
 								download="inkspired-tattoo.png"
-								className="px-4 py-2 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition-colors"
+								className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg rounded-full font-medium transition-all transform hover:scale-105"
 							>
 								Download Design
 							</a>
