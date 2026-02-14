@@ -32,6 +32,7 @@ app.post(
 	'/api/generate',
 	async (req: Request<{}, {}, GenerateRequest>, res: Response) => {
 		try {
+			// Get prompt
 			const { prompt } = req.body;
 
 			if (!prompt) {
