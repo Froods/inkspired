@@ -71,7 +71,7 @@ export default function GeneratedTattooDisplay({
 				{imageStatus && (
 					<div className="relative group rounded-2xl overflow-hidden shadow-2xl border border-white/10 max-w-md w-full">
 						<img
-							src={imageStatus}
+							src={`data:image/png;base64,${imageStatus}`}
 							alt="Generated Tattoo"
 							className="w-full h-auto object-cover"
 						/>

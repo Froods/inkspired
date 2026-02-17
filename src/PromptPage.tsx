@@ -164,7 +164,7 @@ export default function PromptPage() {
 			console.log(`Sending prompt to backend: ${tatPrompt}`);
 
 			// Fetch call
-			const response = await fetch('http://localhost:3000/api/generate', {
+			const response = await fetch('http://localhost:8000/generate-tattoo', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -181,8 +181,10 @@ export default function PromptPage() {
 			// Receive Data
 			const data = await response.json();
 
-			if (data.success && data.imageUrl) {
-				setGeneratedImage(data.imageUrl); // Save the Base64 string
+			console.log(data);
+
+			if (data.success && data.imageBase64) {
+				setGeneratedImage(data.imageBase64); // Save the Base64 string
 			} else {
 				throw new Error('No image returned from AI');
 			}
