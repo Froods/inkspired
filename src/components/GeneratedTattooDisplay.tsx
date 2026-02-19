@@ -78,7 +78,7 @@ export default function GeneratedTattooDisplay({
 						{/* Optional: Download Button Overlay */}
 						<div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 							<a
-								href={imageStatus}
+								href={`data:image/png;base64,${imageStatus}`}
 								download="inkspired-tattoo.png"
 								className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg rounded-full font-medium transition-all transform hover:scale-105"
 							>
