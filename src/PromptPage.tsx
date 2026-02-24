@@ -20,23 +20,11 @@ function PromptInput({
 }: PromptInputProps) {
 	const [input, setInput] = useState('');
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const MAX_CHARS = 500;
 
 	const handleSubmit = () => {
 		if (input.trim()) {
-			onSend(
-				`Analyze the artistic style of these 6 reference images deeply. Pay attention to line weight, shading techniques (or lack thereof), contrast, and texture. 
-				
-				Analysis Task:
-				First, describe this style in 3 keywords.
-
-				Generation Task:
-				Now using that exact style while really paying attention to this description, generate a tattoo from this exact description: 
-				${input}
-				
-				Ensure the background is white (#FFFFFF in hexa-decimal color code)
-				The image must contain exactly one single isolated design. Do NOT create a collage, a flash sheet, or multiple variations in one image. Tattoo must NOT be displayed on photograph of human, NO skin, NO flesh.
-				`,
-			); // Get input and add context
+			onSend(input); // Get input and add context
 			setInput('');
 			// Reset height after sending
 			if (textareaRef.current) {
@@ -66,7 +54,9 @@ function PromptInput({
 		<div className="w-full max-w-4xl mx-auto">
 			<div className="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl shadow-black/50 transition-all duration-300">
 				<div className="relative">
+					{/* Text Area */}
 					<textarea
+						maxLength={MAX_CHARS}
 						ref={textareaRef}
 						value={input}
 						onChange={(e) => setInput(e.target.value)}
@@ -75,6 +65,11 @@ function PromptInput({
 						className="w-full px-6 py-5 bg-transparent border-none outline-none resize-none text-white text-base leading-relaxed placeholder:text-white/40 min-h-[60px] max-h-[200px]"
 						style={{ overflow: 'hidden' }}
 					/>
+
+					{/* Char counter for Text Area */}
+					<div className="absolute bottom-2 right-2 text-xs text-white/40 pointer-events-none">
+						{input.length}/{MAX_CHARS}
+					</div>
 				</div>
 
 				{/* Input Actions Footer */}

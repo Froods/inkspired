@@ -4,7 +4,25 @@ from dotenv import load_dotenv
 from image_gen import generate_image
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+########################
+##### Instructions #####
+########################
+
+SYSTEM_INSTRUCTIONS = """Analyze the artistic style of these 6 reference images deeply. Pay attention to line weight, shading techniques (or lack thereof), contrast, and texture. 
+
+Analysis Task:
+First, describe this style in 3 keywords.
+
+Generation Task:
+Now using that exact style while really paying attention to this description, generate a tattoo from this exact description: 
+{user_prompt}
+
+Ensure the background is white (#FFFFFF in hexa-decimal color code)
+The image must contain exactly one single isolated design. Do NOT create a collage, a flash sheet, or multiple variations in one image. Tattoo must NOT be displayed on photograph of human, NO skin, NO flesh.
+"""
 
 #################
 ##### Setup #####
@@ -31,7 +49,7 @@ app.add_middleware(
 
 # Define what tattoo request should look like
 class TattooReq(BaseModel):
-	prompt: str
+	prompt: str = Field(..., max_length=500)
 
 ###########################
 ##### Generate tattoo #####
@@ -53,7 +71,8 @@ class TattooReq(BaseModel):
 # POST method with TattooRequest
 @app.post("/generate-tattoo")
 def gen_tattoo_from_request(req: TattooReq):
-	img = generate_image(api_key, model, req.prompt)
+	full_prompt = SYSTEM_INSTRUCTIONS.replace("{user_prompt}", req.prompt)
+	img = generate_image(api_key, model, full_prompt)
 	return {
 		"success": True,
 		"imageBase64": img
