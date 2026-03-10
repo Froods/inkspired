@@ -30,7 +30,7 @@ The image must contain exactly one single isolated design. Do NOT create a colla
 
 # Load and store enviroment variables
 load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
+api_key = os.getenv("FAL_KEY")
 frontend_port = os.getenv("FRONTEND_PORT")
 
 # Settings for API request
@@ -70,9 +70,9 @@ class TattooReq(BaseModel):
 
 # POST method with TattooRequest
 @app.post("/generate-tattoo")
-def gen_tattoo_from_request(req: TattooReq):
+async def gen_tattoo_from_request(req: TattooReq):
 	full_prompt = SYSTEM_INSTRUCTIONS.replace("{user_prompt}", req.prompt)
-	img = generate_image(api_key, model, full_prompt)
+	img = await generate_image(api_key, model, full_prompt)
 	return {
 		"success": True,
 		"imageBase64": img
