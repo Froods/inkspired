@@ -1,9 +1,6 @@
 import base64
-import asyncio
-import fal_client
+import replicate
 import requests
-from PIL import Image
-from io import BytesIO
 
 # Convert image bytes into base64 string
 def convert_to_64(url):
@@ -20,20 +17,21 @@ def convert_to_64(url):
 		return None
 
 # Generate image with call to AI-generation API
-async def generate_image(api_key, model, prompt):
-	# Use subscribe_async to wait for the result in one go
-	result = await fal_client.subscribe_async(
-		"fal-ai/flux-2",
-		arguments={
-			"prompt": prompt,
-			"image_size": "square_hd", # Using the enum string is safer
-			"enable_safety_checker": False,
-			"num_images": 1
-		}
+async def generate_image(prompt):
+	# JSON to send API request
+	input = {
+		"prompt": prompt,
+		"output_format": "png"
+	}
+
+	# Send request and store response in result
+	# Response is a URL
+	result = await replicate.async_run(
+		"black-forest-labs/flux-2-dev",
+		input=input
 	)
 
-	# In the fal-ai/flux-2 schema, the images are in a list
-	url = result['images'][0]['url']
-	image = convert_to_64(url)
+	# Convert image to base64 and value
+	image = convert_to_64(result)
 	return image
 
