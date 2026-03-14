@@ -2,28 +2,17 @@ import os
 import uvicorn
 from dotenv import load_dotenv
 from image_gen import generate_image
+from tattoo_instructions import BLACKWORK_INSTRUCTIONS, AMERICANA_INSTRUCTIONS
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-
-########################
-##### Instructions #####
-########################
-
-BLACKWORK_INSTRUCTIONS = """
-Generate a blackwork tattoo from this exact description: 
-{user_prompt}
-
-Ensure the background is white (#FFFFFF in hexa-decimal color code)
-The image must contain exactly one single isolated design. Do NOT create a collage, a flash sheet, or multiple variations in one image. Tattoo must NOT be displayed on photograph of human, NO skin, NO flesh.
-"""
-
-SYSTEM_INSTRUCTIONS = BLACKWORK_INSTRUCTIONS
-
 #################
 ##### Setup #####
 #################
+
+# Setup instructions 
+SYSTEM_INSTRUCTIONS = BLACKWORK_INSTRUCTIONS
 
 # Load and store enviroment variables
 load_dotenv()

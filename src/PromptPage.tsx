@@ -97,7 +97,7 @@ function PromptInput({
 						className={cn(
 							'flex h-9 w-9 items-center justify-center rounded-full transition-all',
 							hasContent
-								? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg'
+								? 'bg-gradient-to-r from-blue-500 to-blue-500/75 text-white hover:from-blue-600 hover:to-blue-600/75 shadow-lg'
 								: 'bg-white/10 text-white/40 cursor-not-allowed',
 						)}
 						aria-label="Send Prompt"
@@ -185,38 +185,47 @@ export default function PromptPage() {
 			<div className="absolute inset-0 overflow-hidden">
 				<ElegantShape
 					delay={0.3}
-					width={600}
-					height={140}
+					width={250}
+					height={250}
 					rotate={12}
-					gradient="from-purple-500/[0.15]"
-					className="left-[-10%] md:left-[-5%] top-[15%] md:top-[20%]"
+					className="left-[-10%] md:left-[2%] top-[15%] md:top-[2%]"
+					illustration={3}
 				/>
 
 				<ElegantShape
 					delay={0.5}
-					width={500}
-					height={120}
+					width={250}
+					height={250}
 					rotate={-15}
-					gradient="from-pink-500/[0.15]"
-					className="right-[-5%] md:right-[0%] top-[70%] md:top-[75%]"
+					className="right-[50%] md:right-[7%] top-[70%] md:top-[65%]"
+					illustration={1}
 				/>
 
 				<ElegantShape
 					delay={0.4}
-					width={300}
-					height={80}
-					rotate={-8}
-					gradient="from-violet-500/[0.15]"
-					className="left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]"
+					width={220}
+					height={220}
+					rotate={22}
+					className="left-[5%] md:left-[35%] bottom-[5%] md:bottom-[-2%]"
+					illustration={4}
 				/>
 
 				<ElegantShape
 					delay={0.6}
-					width={200}
-					height={60}
+					width={400}
+					height={400}
 					rotate={20}
-					gradient="from-fuchsia-500/[0.15]"
-					className="right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
+					className="right-[15%] md:right-[-3%] top-[10%] md:top-[-8%]"
+					illustration={2}
+				/>
+
+				<ElegantShape
+					delay={0.6}
+					width={400}
+					height={400}
+					rotate={-25}
+					className="left-[10%] md:left-[3%] bottom-[10%] md:bottom-[-2%]"
+					illustration={5}
 				/>
 			</div>
 
@@ -238,7 +247,10 @@ export default function PromptPage() {
 							</span>
 							<br />
 							<span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
-								Unique Tattoo
+								<span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-500/75 to-blue-500">
+									Unique
+								</span>{' '}
+								Tattoo
 							</span>
 						</h1>
 					</motion.div>

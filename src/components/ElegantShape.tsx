@@ -1,5 +1,10 @@
-import { motion } from 'framer-motion';
+import { motion, number } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import skullImage from '../assets/skull.png';
+import rose from '../assets/rose.png';
+import bird from '../assets/bird.png';
+import compas from '../assets/compas.png';
+import shark from '../assets/shark.png';
 
 /**
  * ElegantShape Component
@@ -13,6 +18,7 @@ import { cn } from '@/lib/utils';
  * @param height - Height of the shape
  * @param rotate - Rotation of the shape in degrees
  * @param gradient - Tailwind gradient classes for the shape
+ * @param illustration - Illustration to display
  */
 export function ElegantShape({
 	className,
@@ -20,15 +26,29 @@ export function ElegantShape({
 	width = 400,
 	height = 100,
 	rotate = 0,
-	gradient = 'from-white/[0.08]',
+	illustration = 1,
 }: {
 	className?: string;
 	delay?: number;
 	width?: number;
 	height?: number;
 	rotate?: number;
-	gradient?: string;
+	illustration?: number;
 }) {
+	let illustrationImage: string = skullImage;
+
+	if (illustration === 1) {
+		illustrationImage = skullImage;
+	} else if (illustration === 2) {
+		illustrationImage = rose;
+	} else if (illustration === 3) {
+		illustrationImage = bird;
+	} else if (illustration === 4) {
+		illustrationImage = compas;
+	} else if (illustration === 5) {
+		illustrationImage = shark;
+	}
+
 	return (
 		<motion.div
 			initial={{
@@ -65,16 +85,15 @@ export function ElegantShape({
 				className="relative"
 			>
 				<div
-					className={cn(
-						'absolute inset-0 rounded-full',
-						'bg-gradient-to-r to-transparent',
-						gradient,
-						'backdrop-blur-[2px] border-2 border-white/[0.15]',
-						'shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]',
-						'after:absolute after:inset-0 after:rounded-full',
-						'after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]',
-					)}
-				/>
+					className="absolute inset-0"
+					style={{
+						backgroundImage: `url(${illustrationImage})`,
+						backgroundSize: 'contain',
+						backgroundRepeat: 'no-repeat',
+						backgroundPosition: 'center',
+						filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.8))', // White glow
+					}}
+				></div>
 			</motion.div>
 		</motion.div>
 	);
