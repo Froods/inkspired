@@ -21,7 +21,7 @@ async def generate_image(prompt):
 	# JSON to send API request
 	input = {
 		"prompt": prompt,
-		"output_format": "png"
+		"output_format": "png",
 	}
 
 	# Send request and store response in result

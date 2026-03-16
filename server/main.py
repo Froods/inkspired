@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 #################
 
 # Setup instructions 
-SYSTEM_INSTRUCTIONS = BLACKWORK_INSTRUCTIONS
+SYSTEM_INSTRUCTIONS = AMERICANA_INSTRUCTIONS
 
 # Load and store enviroment variables
 load_dotenv()
@@ -41,7 +41,7 @@ class TattooReq(BaseModel):
 @app.post("/generate-tattoo")
 async def gen_tattoo_from_request(req: TattooReq):
 	full_prompt = SYSTEM_INSTRUCTIONS.replace("{user_prompt}", req.prompt)
-	img = await generate_image(full_prompt)
+	img = await generate_image(full_prompt) # Tilføj style her - Style skal bestemme input images -> kræver at funktionen også tilpasses
 	return {
 		"success": True,
 		"imageBase64": img
