@@ -1,6 +1,14 @@
 import base64
-import replicate
+import os
 import requests
+import wavespeed
+from dotenv import load_dotenv
+from fastapi.concurrency import run_in_threadpool
+
+# Load environment variables
+load_dotenv()
+WAVESPEED_API_KEY = os.getenv("WAVESPEED_API_KEY")
+client = wavespeed.Client(api_key=WAVESPEED_API_KEY)
 
 # Convert image bytes into base64 string
 def convert_to_64(url):
@@ -20,18 +28,31 @@ def convert_to_64(url):
 async def generate_image(prompt):
 	# JSON to send API request
 	input = {
-		"prompt": prompt,
-		"output_format": "png",
+			"prompt": prompt,
+			"image_size": "square_hd", 
+			"enable_safety_checker": False,
+			"enable_prompt_expansion": True,
+			"num_images": 1,
+			"output_format": "png",
+			"guidance_scale": 2.5,
+			"num_inference_steps": 28,
+			"acceleration": "regular"
 	}
 
 	# Send request and store response in result
 	# Response is a URL
-	result = await replicate.async_run(
-		"black-forest-labs/flux-2-dev",
-		input=input
+	result = await run_in_threadpool( 
+			client.run, # Function name (no parentheses!)
+        "wavespeed-ai/flux-2-dev/text-to-image-lora", # Arg 1
+        {
+            "loras": [],
+            "prompt": prompt,
+            "size": "1024*1024"
+        } # Arg 2
 	)
 
 	# Convert image to base64 and value
-	image = convert_to_64(result)
+	url = result['outputs'][0]
+	image = convert_to_64(url)
 	return image
 

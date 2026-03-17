@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 #################
 
 # Setup instructions 
-SYSTEM_INSTRUCTIONS = AMERICANA_INSTRUCTIONS
+SYSTEM_INSTRUCTIONS = BLACKWORK_INSTRUCTIONS
 
 # Load and store enviroment variables
 load_dotenv()
