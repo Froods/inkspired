@@ -2,7 +2,7 @@ import os
 import uvicorn
 from dotenv import load_dotenv
 from image_gen import generate_image
-from tattoo_instructions import BLACKWORK_INSTRUCTIONS, AMERICANA_INSTRUCTIONS, blackwork
+from tattoo_instructions import blackwork, traditional, neotraditional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -11,10 +11,13 @@ from pydantic import BaseModel, Field
 ##### Setup #####
 #################
 
+# Set the specific style
+style = neotraditional
+
 # Setup instructions 
-SYSTEM_INSTRUCTIONS = blackwork.instructions
-lora = blackwork.lora
-scale = blackwork.scale
+SYSTEM_INSTRUCTIONS = style.instructions
+lora = style.lora
+scale = style.scale
 
 # Load and store enviroment variables
 load_dotenv()

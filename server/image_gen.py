@@ -27,16 +27,16 @@ def convert_to_64(url):
 # Generate image with call to AI-generation API
 async def generate_image(prompt, lora, scale):
 	# Send request and store response in result
-	# Response is a URL
 	result = await run_in_threadpool( 
-			client.run, # Function name (no parentheses!)
+			client.run,
         "wavespeed-ai/flux-2-dev/text-to-image-lora", # Arg 1
         {
             "loras": [{
 				"path": lora,
-                "scale": scale  # LoRA strength
+                "scale": scale
 			}],
             "prompt": prompt,
+			"seed": -1,
             "size": "1024*1024"
         } # Arg 2
 	)
