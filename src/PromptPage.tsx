@@ -1,15 +1,25 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles, Send, Mic, Image as ImageIcon, Zap } from 'lucide-react';
+import {
+	Sparkles,
+	Send,
+	Mic,
+	Image as ImageIcon,
+	Zap,
+	Paintbrush,
+} from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ElegantShape } from '@/components/ElegantShape';
 import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
+import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
+
+type TattooPair = [string, TattooStyle];
 
 // Props for the PromptInput component
 interface PromptInputProps {
-	onSend?: (message: string) => void;
+	onSend?: (data: TattooPair) => void;
 	placeholder?: string;
 }
 
@@ -19,12 +29,15 @@ function PromptInput({
 	placeholder = 'Describe your dream tattoo...',
 }: PromptInputProps) {
 	const [input, setInput] = useState('');
+	const [isStyleDropdownOpen, setIsStyleDropdownOpen] = useState(false);
+	const [selectedStyle, setSelectedStyle] =
+		useState<TattooStyle>('Traditional');
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const MAX_CHARS = 500;
 
 	const handleSubmit = () => {
 		if (input.trim()) {
-			onSend(input); // Get input and add context
+			onSend([input, selectedStyle]); // Get input
 			setInput('');
 			// Reset height after sending
 			if (textareaRef.current) {
@@ -74,7 +87,31 @@ function PromptInput({
 
 				{/* Input Actions Footer */}
 				<div className="flex items-center justify-between px-4 py-3 border-t border-black/10">
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-2 relative">
+						<button
+							type="button"
+							onClick={() => setIsStyleDropdownOpen(true)}
+							className={cn(
+								'flex h-9 items-center justify-center gap-2 px-3 rounded-full transition-all',
+								selectedStyle
+									? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+									: 'text-black/60 hover:text-black hover:bg-black/10',
+							)}
+							aria-label="Choose Style"
+						>
+							<Paintbrush className="h-4 w-4" />
+							<span className="text-sm font-medium">
+								{selectedStyle || 'Style'}
+							</span>
+						</button>
+
+						<StyleDropdown
+							isOpen={isStyleDropdownOpen}
+							onClose={() => setIsStyleDropdownOpen(false)}
+							selectedStyle={selectedStyle}
+							onSelect={setSelectedStyle}
+						/>
+
 						<button
 							type="button"
 							className="flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:text-black hover:bg-black/10 transition-all"

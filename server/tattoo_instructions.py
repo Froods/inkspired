@@ -15,7 +15,7 @@ The image must contain exactly one single isolated design. Do NOT create a colla
 Don't add any random mandala pattern around the tattoo design, unless you where specifically told to.
 """
 
-blackwork = Style(BLACKWORK_INSTRUCTIONS, "https://huggingface.co/fredefar/tat-blackwork/resolve/main/blackwork.safetensors", 0.2)
+blackwork = Style(BLACKWORK_INSTRUCTIONS, "", 0.2)
 
 ### TRADITIONAL ###
 
