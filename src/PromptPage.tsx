@@ -14,6 +14,9 @@ import { cn } from '@/lib/utils';
 import { ElegantShape } from '@/components/ElegantShape';
 import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
 import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import LoginModal from './components/LoginModal';
 
 type TattooPair = [string, TattooStyle];
 
@@ -154,6 +157,9 @@ export default function PromptPage() {
 	const [isLoading, setIsLoading] = useState(false); // Is the image currently being generated?
 	const [error, setError] = useState<string | null>(null); // For errors
 	const [showModal, setShowModal] = useState(false); // For showing modal
+	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+	const navigate = useNavigate();
+	const { claims, supabase } = useAuth();
 
 	/// Functions
 	// Generate image from prompt
@@ -215,6 +221,16 @@ export default function PromptPage() {
 
 	return (
 		<div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-white">
+			{/* Login Button */}
+			<div className="absolute top-6 left-6 z-50">
+				<button
+					onClick={() => setIsLoginModalOpen(true)}
+					className="px-6 py-2.5 rounded-full bg-black/5 hover:bg-black/10 text-black font-medium transition-all duration-300 backdrop-blur-sm border border-black/10 shadow-sm"
+				>
+					Login
+				</button>
+			</div>
+
 			{/* Background Ambient Gradient */}
 			<div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.05] via-transparent to-pink-500/[0.05] blur-3xl" />
 
@@ -323,6 +339,11 @@ export default function PromptPage() {
 						loadingStatus={isLoading}
 						isOpen={showModal}
 						onClose={() => setShowModal(false)}
+					/>
+
+					<LoginModal 
+						isOpen={isLoginModalOpen} 
+						onClose={() => setIsLoginModalOpen(false)} 
 					/>
 
 					{/* Footer Stats / Trust Indicators */}

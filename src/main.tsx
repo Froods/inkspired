@@ -1,10 +1,22 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
 import PromptPage from './PromptPage.tsx';
+import Login from './Login.jsx';
+import SignUp from './pages/SignUp.tsx';
+import { AuthProvider } from './AuthContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<PromptPage></PromptPage>
+		<AuthProvider>
+			<BrowserRouter>
+				<Routes>
+					<Route path="/" element={<PromptPage />}></Route>
+					<Route path="/login" element={<Login />}></Route>
+					<Route path="/signup" element={<SignUp />}></Route>
+				</Routes>
+			</BrowserRouter>
+		</AuthProvider>
 	</StrictMode>,
 );
