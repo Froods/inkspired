@@ -113,7 +113,10 @@ export default function LoginModal({
 						<Mail className="w-4 h-4" />
 						Sign up
 					</button>
-					<button className="flex-1 flex items-center justify-center gap-2 py-3 px-2 border border-black/20 rounded-full hover:bg-black/5 transition-colors text-sm font-medium text-black">
+					<button
+						onClick={() => navigate('/login')}
+						className="flex-1 flex items-center justify-center gap-2 py-3 px-2 border border-black/20 rounded-full hover:bg-black/5 transition-colors text-sm font-medium text-black"
+					>
 						<Mail className="w-4 h-4" />
 						Log in
 					</button>

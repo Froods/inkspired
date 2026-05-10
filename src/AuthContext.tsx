@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // Typen for claims-objektet fra Supabase
 interface Claims {
@@ -24,16 +25,22 @@ const supabase = createClient(
 // AuthProvider er en komponent der omslutter hele din app
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [claims, setClaims] = useState<Claims | null>(null);
+	const navigate = useNavigate();
+	const location = useLocation();
 
 	useEffect(() => {
 		supabase.auth.getClaims().then(({ data: { claims } }) => setClaims(claims));
 
 		const {
 			data: { subscription },
-		} = supabase.auth.onAuthStateChange(() => {
+		} = supabase.auth.onAuthStateChange((event) => {
 			supabase.auth
 				.getClaims()
 				.then(({ data: { claims } }) => setClaims(claims));
+
+			if (event === 'SIGNED_IN' && location.pathname === '/login') {
+				navigate('/');
+			}
 		});
 
 		return () => subscription.unsubscribe();
