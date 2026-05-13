@@ -28,6 +28,8 @@ export default function Login() {
 			setError('Incorrect email or password.');
 		} else if (error) {
 			setError(error.message);
+		} else {
+			navigate('/');
 		}
 		// On success, Supabase triggers onAuthStateChange in AuthContext,
 		// which updates claims automatically. Redirect logic can be added here.

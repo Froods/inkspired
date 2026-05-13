@@ -4,6 +4,7 @@ import { X, Phone, Mail } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/AuthContext';
 
 export default function LoginModal({
 	isOpen,
@@ -14,6 +15,7 @@ export default function LoginModal({
 }) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const navigate = useNavigate();
+	const { supabase } = useAuth();
 
 	// Sync React state with the Native Dialog API
 	useEffect(() => {
@@ -27,6 +29,16 @@ export default function LoginModal({
 			dialog.close();
 		}
 	}, [isOpen]);
+
+	// Google Signin function
+	const handleGoogleLogin = async () => {
+		await supabase.auth.signInWithOAuth({
+			provider: 'google',
+			options: {
+				redirectTo: window.location.origin, // sends user back to "/" after login
+			},
+		});
+	};
 
 	if (!isOpen) return null;
 
@@ -64,7 +76,10 @@ export default function LoginModal({
 				</p>
 
 				<div className="flex flex-col gap-3 w-full">
-					<button className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-black/20 rounded-full hover:bg-black/5 transition-colors text-sm font-medium text-black">
+					<button
+						onClick={handleGoogleLogin}
+						className="flex items-center justify-center gap-3 w-full py-3 px-4 border border-black/20 rounded-full hover:bg-black/5 transition-colors text-sm font-medium text-black"
+					>
 						<svg className="w-5 h-5" viewBox="0 0 24 24">
 							<path
 								fill="currentColor"

@@ -29,14 +29,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const location = useLocation();
 
 	useEffect(() => {
-		supabase.auth.getClaims().then(({ data: { claims } }) => setClaims(claims));
+		supabase.auth.getClaims().then((res) => {
+			setClaims(res.data?.claims || null);
+		});
 
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((event) => {
-			supabase.auth
-				.getClaims()
-				.then(({ data: { claims } }) => setClaims(claims));
+			supabase.auth.getClaims().then((res) => {
+				setClaims(res.data?.claims || null);
+			});
 
 			if (event === 'SIGNED_IN' && location.pathname === '/login') {
 				navigate('/');
