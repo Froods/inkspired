@@ -1,14 +1,26 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import {
+	describe,
+	it,
+	expect,
+	vi,
+	beforeEach,
+	beforeAll,
+	afterAll,
+} from 'vitest';
 import GeneratedTattooDisplay from '@/components/GeneratedTattooDisplay';
 
 describe('GeneratedTattooDisplay', () => {
 	// Mock HTMLDialogElement methods
 	beforeAll(() => {
-		HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
+		HTMLDialogElement.prototype.showModal = vi.fn(function (
+			this: HTMLDialogElement,
+		) {
 			this.setAttribute('open', '');
 		});
-		HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+		HTMLDialogElement.prototype.close = vi.fn(function (
+			this: HTMLDialogElement,
+		) {
 			this.removeAttribute('open');
 		});
 	});
@@ -33,7 +45,7 @@ describe('GeneratedTattooDisplay', () => {
 				errorStatus={null}
 				isOpen={false}
 				onClose={vi.fn()}
-			/>
+			/>,
 		);
 		expect(container).toBeEmptyDOMElement();
 	});
@@ -46,7 +58,7 @@ describe('GeneratedTattooDisplay', () => {
 				errorStatus={null}
 				isOpen={true}
 				onClose={vi.fn()}
-			/>
+			/>,
 		);
 
 		// Since we mocked showModal to set the open attribute, it should be visible
@@ -67,7 +79,7 @@ describe('GeneratedTattooDisplay', () => {
 				errorStatus={null}
 				isOpen={true}
 				onClose={onCloseMock}
-			/>
+			/>,
 		);
 
 		const closeButton = screen.getByRole('button', { name: /close/i });
@@ -85,7 +97,7 @@ describe('GeneratedTattooDisplay', () => {
 				errorStatus={null}
 				isOpen={true}
 				onClose={onCloseMock}
-			/>
+			/>,
 		);
 
 		const dialog = screen.getByRole('dialog');
@@ -103,9 +115,11 @@ describe('GeneratedTattooDisplay', () => {
 				errorStatus={null}
 				isOpen={true}
 				onClose={vi.fn()}
-			/>
+			/>,
 		);
-		expect(screen.getByText(/Inkspired AI is dreaming up your design/i)).toBeInTheDocument();
+		expect(
+			screen.getByText(/Inkspired AI is dreaming up your design/i),
+		).toBeInTheDocument();
 	});
 
 	it('displays error state', () => {
@@ -117,7 +131,7 @@ describe('GeneratedTattooDisplay', () => {
 				errorStatus={errorMessage}
 				isOpen={true}
 				onClose={vi.fn()}
-			/>
+			/>,
 		);
 		expect(screen.getByText(errorMessage)).toBeInTheDocument();
 	});
@@ -131,7 +145,7 @@ describe('GeneratedTattooDisplay', () => {
 				errorStatus={null}
 				isOpen={true}
 				onClose={vi.fn()}
-			/>
+			/>,
 		);
 
 		const img = screen.getByRole('img', { name: /Generated Tattoo/i });

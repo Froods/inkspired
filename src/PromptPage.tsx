@@ -1,21 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {
-	Sparkles,
-	Send,
-	Mic,
-	Image as ImageIcon,
-	Zap,
-	Paintbrush,
-} from 'lucide-react';
+import { Send, Mic, Image as ImageIcon, Paintbrush } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ElegantShape } from '@/components/ElegantShape';
 import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
 import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
 import LoginModal from './components/LoginModal';
 import Sidebar from './components/Sidebar';
 
@@ -159,12 +150,10 @@ export default function PromptPage() {
 	const [error, setError] = useState<string | null>(null); // For errors
 	const [showModal, setShowModal] = useState(false); // For showing modal
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-	const navigate = useNavigate();
-	const { claims, supabase } = useAuth();
 
 	/// Functions
 	// Generate image from prompt
-	async function genInBackend(tatPrompt: string) {
+	async function genInBackend([tatPrompt, style]: TattooPair) {
 		setIsLoading(true);
 		setError(null);
 		setGeneratedImage(null); // Clear previous image
@@ -179,7 +168,7 @@ export default function PromptPage() {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ prompt: tatPrompt }),
+				body: JSON.stringify({ prompt: tatPrompt, style: style }),
 			});
 
 			// Handle Network Errors

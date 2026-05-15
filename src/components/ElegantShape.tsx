@@ -1,4 +1,4 @@
-import { motion, number } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import skullImage from '../assets/skull.png';
 import rose from '../assets/rose.png';

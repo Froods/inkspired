@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Phone, Mail } from 'lucide-react';
+import { X, Mail } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
