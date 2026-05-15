@@ -2,7 +2,7 @@ import os
 import uvicorn
 from dotenv import load_dotenv
 from image_gen import generate_image
-from tattoo_instructions import BLACKWORK_INSTRUCTIONS, AMERICANA_INSTRUCTIONS
+from tattoo_instructions import blackwork, traditional, neotraditional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -11,8 +11,14 @@ from pydantic import BaseModel, Field
 ##### Setup #####
 #################
 
-# Setup instructions 
-SYSTEM_INSTRUCTIONS = AMERICANA_INSTRUCTIONS
+# Dict of all styles
+styles = {
+	"Blackwork": blackwork,
+	"Traditional": traditional,
+	"Neo-Traditional": neotraditional
+}
+
+
 
 # Load and store enviroment variables
 load_dotenv()
@@ -31,7 +37,8 @@ app.add_middleware(
 
 # Define what tattoo request should look like
 class TattooReq(BaseModel):
-	prompt: str = Field(..., max_length=500)
+	#prompt: str = Field(..., max_length=500)
+	prompt: tuple[str, str] = Field(...)
 
 ###########################
 ##### Generate tattoo #####
@@ -40,12 +47,23 @@ class TattooReq(BaseModel):
 # POST method with TattooRequest
 @app.post("/generate-tattoo")
 async def gen_tattoo_from_request(req: TattooReq):
-	full_prompt = SYSTEM_INSTRUCTIONS.replace("{user_prompt}", req.prompt)
-	img = await generate_image(full_prompt) # Tilføj style her - Style skal bestemme input images -> kræver at funktionen også tilpasses
+	# Set the specific style
+	style = styles[req.prompt[1]]
+
+	# Setup instructions 
+	instructions = style.instructions
+	lora = style.lora
+	scale = style.scale
+
+	# Combine user prompt with style's template prompt
+	full_prompt = instructions.replace("{user_prompt}", req.prompt[0])
+
+	# Generate image
+	img = await generate_image(full_prompt, lora, scale) # Tilføj style her - Style skal bestemme input images -> kræver at funktionen også tilpasses
 	return {
 		"success": True,
 		"imageBase64": img
-		}
+	}
 
 ####################################
 ##### Safety from unwanted run #####

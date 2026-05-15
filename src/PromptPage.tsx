@@ -1,15 +1,29 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles, Send, Mic, Image as ImageIcon, Zap } from 'lucide-react';
+import {
+	Sparkles,
+	Send,
+	Mic,
+	Image as ImageIcon,
+	Zap,
+	Paintbrush,
+} from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ElegantShape } from '@/components/ElegantShape';
 import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
+import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import LoginModal from './components/LoginModal';
+import Sidebar from './components/Sidebar';
+
+type TattooPair = [string, TattooStyle];
 
 // Props for the PromptInput component
 interface PromptInputProps {
-	onSend?: (message: string) => void;
+	onSend?: (data: TattooPair) => void;
 	placeholder?: string;
 }
 
@@ -19,12 +33,15 @@ function PromptInput({
 	placeholder = 'Describe your dream tattoo...',
 }: PromptInputProps) {
 	const [input, setInput] = useState('');
+	const [isStyleDropdownOpen, setIsStyleDropdownOpen] = useState(false);
+	const [selectedStyle, setSelectedStyle] =
+		useState<TattooStyle>('Traditional');
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const MAX_CHARS = 500;
 
 	const handleSubmit = () => {
 		if (input.trim()) {
-			onSend(input); // Get input and add context
+			onSend([input, selectedStyle]); // Get input
 			setInput('');
 			// Reset height after sending
 			if (textareaRef.current) {
@@ -52,7 +69,7 @@ function PromptInput({
 
 	return (
 		<div className="w-full max-w-4xl mx-auto">
-			<div className="relative bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl shadow-black/50 transition-all duration-300">
+			<div className="relative bg-black/5 backdrop-blur-xl border border-black/20 rounded-3xl shadow-2xl shadow-black/10 transition-all duration-300">
 				<div className="relative">
 					{/* Text Area */}
 					<textarea
@@ -62,29 +79,53 @@ function PromptInput({
 						onChange={(e) => setInput(e.target.value)}
 						onKeyDown={handleKeyDown}
 						placeholder={placeholder}
-						className="w-full px-6 py-5 bg-transparent border-none outline-none resize-none text-white text-base leading-relaxed placeholder:text-white/40 min-h-[60px] max-h-[200px]"
+						className="w-full px-6 py-5 bg-transparent border-none outline-none resize-none text-black text-base leading-relaxed placeholder:text-black/40 min-h-[60px] max-h-[200px]"
 						style={{ overflow: 'hidden' }}
 					/>
 
 					{/* Char counter for Text Area */}
-					<div className="absolute bottom-2 right-2 text-xs text-white/40 pointer-events-none">
+					<div className="absolute bottom-2 right-2 text-xs text-black/40 pointer-events-none">
 						{input.length}/{MAX_CHARS}
 					</div>
 				</div>
 
 				{/* Input Actions Footer */}
-				<div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
-					<div className="flex items-center gap-2">
+				<div className="flex items-center justify-between px-4 py-3 border-t border-black/10">
+					<div className="flex items-center gap-2 relative">
 						<button
 							type="button"
-							className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
+							onClick={() => setIsStyleDropdownOpen(true)}
+							className={cn(
+								'flex h-9 items-center justify-center gap-2 px-3 rounded-full transition-all',
+								selectedStyle
+									? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+									: 'text-black/60 hover:text-black hover:bg-black/10',
+							)}
+							aria-label="Choose Style"
+						>
+							<Paintbrush className="h-4 w-4" />
+							<span className="text-sm font-medium">
+								{selectedStyle || 'Style'}
+							</span>
+						</button>
+
+						<StyleDropdown
+							isOpen={isStyleDropdownOpen}
+							onClose={() => setIsStyleDropdownOpen(false)}
+							selectedStyle={selectedStyle}
+							onSelect={setSelectedStyle}
+						/>
+
+						<button
+							type="button"
+							className="flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:text-black hover:bg-black/10 transition-all"
 							aria-label="Upload Image"
 						>
 							<ImageIcon className="h-5 w-5" />
 						</button>
 						<button
 							type="button"
-							className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all"
+							className="flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:text-black hover:bg-black/10 transition-all"
 							aria-label="Use Microphone"
 						>
 							<Mic className="h-5 w-5" />
@@ -98,7 +139,7 @@ function PromptInput({
 							'flex h-9 w-9 items-center justify-center rounded-full transition-all',
 							hasContent
 								? 'bg-gradient-to-r from-blue-500 to-blue-500/75 text-white hover:from-blue-600 hover:to-blue-600/75 shadow-lg'
-								: 'bg-white/10 text-white/40 cursor-not-allowed',
+								: 'bg-black/10 text-black/40 cursor-not-allowed',
 						)}
 						aria-label="Send Prompt"
 					>
@@ -117,6 +158,9 @@ export default function PromptPage() {
 	const [isLoading, setIsLoading] = useState(false); // Is the image currently being generated?
 	const [error, setError] = useState<string | null>(null); // For errors
 	const [showModal, setShowModal] = useState(false); // For showing modal
+	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+	const navigate = useNavigate();
+	const { claims, supabase } = useAuth();
 
 	/// Functions
 	// Generate image from prompt
@@ -177,7 +221,9 @@ export default function PromptPage() {
 	};
 
 	return (
-		<div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#030303]">
+		<div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-white">
+			<Sidebar onLoginClick={() => setIsLoginModalOpen(true)} />
+
 			{/* Background Ambient Gradient */}
 			<div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.05] via-transparent to-pink-500/[0.05] blur-3xl" />
 
@@ -242,11 +288,11 @@ export default function PromptPage() {
 						animate="visible"
 					>
 						<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
-							<span className="bg-clip-text text-transparent bg-gradient-to-b from-white/60 to-white">
-								Your Next Completely
+							<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
+								Your Next
 							</span>
 							<br />
-							<span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+							<span className="bg-clip-text text-transparent bg-gradient-to-b from-black to-black/60">
 								<span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-500/75 to-blue-500">
 									Unique
 								</span>{' '}
@@ -262,7 +308,7 @@ export default function PromptPage() {
 						initial="hidden"
 						animate="visible"
 					>
-						<p className="text-base sm:text-lg md:text-xl text-white/40 mb-12 leading-relaxed font-light tracking-wide max-w-3xl mx-auto px-4">
+						<p className="text-base sm:text-lg md:text-xl text-black/60 mb-12 leading-relaxed font-light tracking-wide max-w-3xl mx-auto px-4">
 							Transform your ideas into unique tattoo designs. Describe your
 							vision, and our AI tattoo generator dreams up custom artwork
 							tailored to your style.
@@ -288,13 +334,18 @@ export default function PromptPage() {
 						onClose={() => setShowModal(false)}
 					/>
 
+					<LoginModal
+						isOpen={isLoginModalOpen}
+						onClose={() => setIsLoginModalOpen(false)}
+					/>
+
 					{/* Footer Stats / Trust Indicators */}
 					<motion.div
 						custom={4}
 						variants={fadeUpVariants}
 						initial="hidden"
 						animate="visible"
-						className="mt-12 flex items-center justify-center gap-8 text-sm text-white/40"
+						className="mt-12 flex items-center justify-center gap-8 text-sm text-black/60"
 					>
 						<div className="flex items-center gap-2">
 							<div className="w-2 h-2 rounded-full bg-green-500" />
@@ -305,7 +356,7 @@ export default function PromptPage() {
 			</div>
 
 			{/* Bottom Overlay for depth */}
-			<div className="absolute inset-0 bg-gradient-to-t from-[#030303] via-transparent to-[#030303]/80 pointer-events-none" />
+			<div className="absolute inset-0 bg-gradient-to-t from-white/50 via-transparent to-white/50 pointer-events-none" />
 		</div>
 	);
 }

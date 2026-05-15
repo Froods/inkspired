@@ -91,7 +91,7 @@ export function ElegantShape({
 						backgroundSize: 'contain',
 						backgroundRepeat: 'no-repeat',
 						backgroundPosition: 'center',
-						filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.8))', // White glow
+						filter: 'invert(1) drop-shadow(0 0 10px rgba(0, 0, 0, 0.8))', // Black and glow
 					}}
 				></div>
 			</motion.div>

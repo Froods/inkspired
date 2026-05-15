@@ -34,3 +34,9 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+lora_trainingsets/*
+.claude/*
+.claude
+.vscode
+lora_trainingsets
