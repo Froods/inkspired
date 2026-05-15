@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/AuthContext';
+import logo from '@/assets/inkspired-logo-slim.svg';
 
 interface SidebarProps {
 	onLoginClick: () => void;
@@ -17,7 +18,10 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 	// Close dropdown when clicking outside
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+			if (
+				dropdownRef.current &&
+				!dropdownRef.current.contains(event.target as Node)
+			) {
 				setIsDropdownOpen(false);
 			}
 		}
@@ -52,7 +56,7 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 					title="Toggle Menu"
 				>
 					<img
-						src="/src/assets/inkspired-logo-slim.svg"
+						src={logo}
 						alt="Inkspired Logo"
 						className="h-10 w-auto transition-transform group-hover:scale-105"
 					/>
@@ -61,7 +65,11 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 					{isExpanded && (
 						<motion.span
 							initial={{ opacity: 0, x: -10 }}
-							animate={{ opacity: 1, x: 0, transition: { duration: 0.2, delay: 0.1 } }}
+							animate={{
+								opacity: 1,
+								x: 0,
+								transition: { duration: 0.2, delay: 0.1 },
+							}}
 							exit={{ opacity: 0, transition: { duration: 0 } }}
 							className="ml-3 font-semibold text-xl tracking-tight text-black whitespace-nowrap"
 						>
@@ -86,8 +94,8 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 							exit={{ opacity: 0, y: 10 }}
 							transition={{ duration: 0.2 }}
 							className={cn(
-								"absolute bottom-full mb-2 left-4 bg-white border border-black/10 shadow-lg rounded-2xl overflow-hidden flex flex-col",
-								isExpanded ? "w-[calc(100%-2rem)]" : "w-48"
+								'absolute bottom-full mb-2 left-4 bg-white border border-black/10 shadow-lg rounded-2xl overflow-hidden flex flex-col',
+								isExpanded ? 'w-[calc(100%-2rem)]' : 'w-48',
 							)}
 						>
 							<button
@@ -117,7 +125,11 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 						{isExpanded && (
 							<motion.div
 								initial={{ opacity: 0, x: -10 }}
-								animate={{ opacity: 1, x: 0, transition: { duration: 0.2, delay: 0.1 } }}
+								animate={{
+									opacity: 1,
+									x: 0,
+									transition: { duration: 0.2, delay: 0.1 },
+								}}
 								exit={{ opacity: 0, transition: { duration: 0 } }}
 								className="ml-3 flex flex-col items-start whitespace-nowrap"
 							>
