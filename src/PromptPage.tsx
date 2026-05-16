@@ -9,6 +9,7 @@ import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
 import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
 import LoginModal from './components/LoginModal';
 import Sidebar from './components/Sidebar';
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 type TattooPair = [string, TattooStyle];
 
@@ -163,7 +164,7 @@ export default function PromptPage() {
 			console.log(`Sending prompt to backend: ${tatPrompt}`);
 
 			// Fetch call
-			const response = await fetch('http://localhost:8000/generate-tattoo', {
+			const response = await fetch(`${backendUrl}/generate-tattoo`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
