@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Paintbrush, Image } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/AuthContext';
 import logo from '@/assets/inkspired-logo-slim.svg';
@@ -14,6 +15,7 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const { claims, supabase } = useAuth();
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const location = useLocation();
 
 	// Close dropdown when clicking outside
 	useEffect(() => {
@@ -79,9 +81,65 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 				</AnimatePresence>
 			</div>
 
-			{/* Middle space for future menu items */}
+			{/* Navigation Tabs */}
 			<div className="flex-1 mt-8 px-4 flex flex-col gap-2">
-				{/* Future navigation items can go here */}
+				<Link
+					to="/"
+					className={cn(
+						'flex items-center w-full p-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
+						location.pathname === '/'
+							? 'bg-blue-50 text-blue-600'
+							: 'text-black/60 hover:text-black hover:bg-black/5'
+					)}
+					title="Create Stencil"
+				>
+					<Paintbrush className={cn('h-5 w-5 shrink-0', location.pathname === '/' ? 'text-blue-600' : 'text-black/60')} />
+					<AnimatePresence>
+						{isExpanded && (
+							<motion.span
+								initial={{ opacity: 0, x: -10 }}
+								animate={{
+									opacity: 1,
+									x: 0,
+									transition: { duration: 0.2, delay: 0.1 },
+								}}
+								exit={{ opacity: 0, transition: { duration: 0 } }}
+								className="whitespace-nowrap"
+							>
+								Create
+							</motion.span>
+						)}
+					</AnimatePresence>
+				</Link>
+
+				<Link
+					to="/gallery"
+					className={cn(
+						'flex items-center w-full p-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
+						location.pathname === '/gallery'
+							? 'bg-blue-50 text-blue-600'
+							: 'text-black/60 hover:text-black hover:bg-black/5'
+					)}
+					title="My Gallery"
+				>
+					<Image className={cn('h-5 w-5 shrink-0', location.pathname === '/gallery' ? 'text-blue-600' : 'text-black/60')} />
+					<AnimatePresence>
+						{isExpanded && (
+							<motion.span
+								initial={{ opacity: 0, x: -10 }}
+								animate={{
+									opacity: 1,
+									x: 0,
+									transition: { duration: 0.2, delay: 0.1 },
+								}}
+								exit={{ opacity: 0, transition: { duration: 0 } }}
+								className="whitespace-nowrap"
+							>
+								Gallery
+							</motion.span>
+						)}
+					</AnimatePresence>
+				</Link>
 			</div>
 
 			{/* Bottom Profile Button */}
