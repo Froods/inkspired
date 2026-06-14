@@ -12,6 +12,7 @@ import {
 	Sparkles,
 	ArrowRight,
 	Image as ImageIcon,
+	Clock,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/AuthContext';
@@ -26,6 +27,7 @@ interface GeneratedImage {
 	prompt: string;
 	style: string;
 	created_at: string;
+	delete_at?: string | null;
 }
 
 export default function Gallery() {
@@ -125,6 +127,22 @@ export default function Gallery() {
 			});
 		} catch {
 			return dateString;
+		}
+	};
+
+	// Calculates days remaining until stencil deletion
+	const getDaysUntilDeletionText = (deleteAtString: string) => {
+		const deleteDate = new Date(deleteAtString);
+		const now = new Date();
+		const diffTime = deleteDate.getTime() - now.getTime();
+		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+		if (diffDays <= 0) {
+			return 'Deleting today';
+		} else if (diffDays === 1) {
+			return 'Deleting tomorrow';
+		} else {
+			return `Deletes in ${diffDays} days`;
 		}
 	};
 
@@ -479,13 +497,19 @@ export default function Gallery() {
 											<Calendar className="w-3 h-3 text-black/35" />
 											Generated on {formatDate(selectedImage.created_at)}
 										</div>
+										{selectedImage.delete_at && (
+											<div className="text-[11px] text-amber-500 flex items-center gap-1 font-light mt-2.5">
+												<Clock className="w-3 h-3 text-amber-500/80 shrink-0" />
+												<span>{getDaysUntilDeletionText(selectedImage.delete_at)}</span>
+											</div>
+										)}
 									</div>
 
 									<div className="space-y-2">
 										<h3 className="text-xs font-bold text-black/40 uppercase tracking-widest">
 											Prompt description
 										</h3>
-										<p className="text-sm md:text-base text-black/85 leading-relaxed font-light tracking-wide bg-black/[0.01] border border-black/5 p-4 rounded-2xl select-text">
+										<p className="text-sm md:text-base text-black/85 leading-relaxed font-light tracking-wide bg-black/[0.01] border border-black/5 p-4 rounded-2xl select-text max-h-36 overflow-y-auto break-words">
 											{selectedImage.prompt}
 										</p>
 									</div>
