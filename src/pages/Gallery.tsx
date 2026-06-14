@@ -36,6 +36,7 @@ export default function Gallery() {
 	const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 	const [downloadingId, setDownloadingId] = useState<string | null>(null);
+	const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
 
 	useEffect(() => {
 		if (!claims) {
@@ -74,8 +75,42 @@ export default function Gallery() {
 		fetchImages();
 	}, [claims, supabase]);
 
-	// Helper to get public URL of the tattoo image from the 'tattoo-images' bucket
+	// Fetch signed URLs for all loaded images in bulk
+	useEffect(() => {
+		if (images.length === 0) return;
+
+		async function getSignedUrls() {
+			try {
+				const paths = images.map((img) => img.storage_path);
+				const { data, error: err } = await supabase.storage
+					.from('tattoo-images')
+					.createSignedUrls(paths, 3600);
+
+				if (err) {
+					console.error('Error creating signed URLs:', err);
+					return;
+				}
+
+				const urlMap: Record<string, string> = {};
+				data?.forEach((item) => {
+					if (item.path && item.signedUrl) {
+						urlMap[item.path] = item.signedUrl;
+					}
+				});
+				setSignedUrls(urlMap);
+			} catch (err) {
+				console.error('Failed to generate signed URLs:', err);
+			}
+		}
+
+		getSignedUrls();
+	}, [images, supabase]);
+
+	// Helper to get public or signed URL of the tattoo image from the 'tattoo-images' bucket
 	const getImageUrl = (storagePath: string) => {
+		if (signedUrls[storagePath]) {
+			return signedUrls[storagePath];
+		}
 		const { data } = supabase.storage.from('tattoo-images').getPublicUrl(storagePath);
 		return data.publicUrl;
 	};
