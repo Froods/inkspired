@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function SignUp() {
 	const { supabase } = useAuth();
@@ -73,15 +74,6 @@ export default function SignUp() {
 							className="w-full px-6 py-[1.1rem] border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
 						/>
 
-						{error && (
-							<p
-								className="text-[1.05rem] text-[#555555] mb-8 leading-relaxed"
-								style={{ color: 'red' }}
-							>
-								{error}
-							</p>
-						)}
-
 						<button
 							onClick={handleSignup}
 							disabled={loading}
@@ -91,6 +83,24 @@ export default function SignUp() {
 							Sign up
 						</button>
 					</form>
+				)}
+				{!success && (
+					<div className="pt-3">
+						{error && (
+							<p
+								className="text-[1.05rem] text-[#555555] leading-relaxed"
+								style={{ color: 'red' }}
+							>
+								{error}
+							</p>
+						)}
+						<p>
+							Already have an account?<span> </span>
+							<Link to="/login">
+								<u>Sign in</u>
+							</Link>
+						</p>
+					</div>
 				)}
 			</div>
 		</div>
