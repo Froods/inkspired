@@ -9,6 +9,7 @@ import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
 import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
 import LoginModal from './components/LoginModal';
 import Sidebar from './components/Sidebar';
+import { useAuth } from './AuthContext';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 type TattooPair = [string, TattooStyle];
@@ -151,7 +152,7 @@ export default function PromptPage() {
 	const [error, setError] = useState<string | null>(null); // For errors
 	const [showModal, setShowModal] = useState(false); // For showing modal
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
+	const { supabase } = useAuth();
 	/// Functions
 	// Generate image from prompt
 	async function genInBackend([tatPrompt, style]: TattooPair) {
@@ -163,11 +164,19 @@ export default function PromptPage() {
 		try {
 			console.log(`Sending prompt to backend: ${tatPrompt}`);
 
+			// Get the current session token
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+
 			// Fetch call
 			const response = await fetch(`${backendUrl}/generate-tattoo`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
+					...(session?.access_token && {
+						Authorization: `Bearer ${session.access_token}`,
+					}),
 				},
 				body: JSON.stringify({ prompt: tatPrompt, style: style }),
 			});

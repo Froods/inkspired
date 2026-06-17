@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Login() {
 	const { supabase } = useAuth();
@@ -73,15 +74,6 @@ export default function Login() {
 						className="w-full px-6 py-[1.1rem] border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
 					/>
 
-					{error && (
-						<p
-							className="text-[1.05rem] leading-relaxed"
-							style={{ color: 'red' }}
-						>
-							{error}
-						</p>
-					)}
-
 					<button
 						onClick={handleLogin}
 						disabled={loading}
@@ -91,6 +83,22 @@ export default function Login() {
 						{loading ? 'Logging in...' : 'Log in'}
 					</button>
 				</form>
+				<div className="pt-3">
+					{error && (
+						<p
+							className="text-[1.05rem] leading-relaxed"
+							style={{ color: 'red' }}
+						>
+							{error}
+						</p>
+					)}
+					<p>
+						New to inkspired?<span> </span>
+						<Link to="/signup">
+							<u>Create an account</u>
+						</Link>
+					</p>
+				</div>
 			</div>
 		</div>
 	);
