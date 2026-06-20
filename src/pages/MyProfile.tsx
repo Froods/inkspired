@@ -95,6 +95,10 @@ export default function MyProfile() {
 			if (error) throw error;
 
 			setUser(data.user);
+			
+			// Force refresh the session to get a new JWT containing the updated metadata
+			await supabase.auth.refreshSession();
+
 			setNameMessage({ type: 'success', text: 'Display name updated successfully!' });
 		} catch (err: any) {
 			console.error('Failed to update display name:', err);
@@ -141,7 +145,7 @@ export default function MyProfile() {
 
 	// Handler: Delete Account
 	const handleDeleteAccount = async () => {
-		if (deleteConfirmText.toLowerCase() !== 'password') return;
+		if (deleteConfirmText.toLowerCase() !== 'delete') return;
 
 		setIsDeleting(true);
 		setDeleteError(null);
@@ -539,14 +543,14 @@ export default function MyProfile() {
 								</div>
 								<h3 className="text-xl font-bold text-black tracking-tight">Delete Account Permanently?</h3>
 								<p className="text-xs text-black/65 font-light leading-relaxed">
-									This action cannot be undone. To proceed, please type the word <strong className="text-red-700 font-semibold">password</strong> in the confirmation box below.
+									This action cannot be undone. To proceed, please type the word <strong className="text-red-700 font-semibold">delete</strong> in the confirmation box below.
 								</p>
 							</div>
 
 							<div className="space-y-4">
 								<input
 									type="text"
-									placeholder="type 'password' to confirm"
+									placeholder="type 'delete' to confirm"
 									value={deleteConfirmText}
 									onChange={(e) => setDeleteConfirmText(e.target.value)}
 									disabled={isDeleting}
@@ -571,7 +575,7 @@ export default function MyProfile() {
 									<button
 										type="button"
 										onClick={handleDeleteAccount}
-										disabled={isDeleting || deleteConfirmText.toLowerCase() !== 'password'}
+										disabled={isDeleting || deleteConfirmText.toLowerCase() !== 'delete'}
 										className="flex-1 py-3 px-4 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-semibold transition-colors text-center disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
 									>
 										{isDeleting ? (
