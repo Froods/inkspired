@@ -98,6 +98,11 @@ export default function Login() {
 							<u>Create an account</u>
 						</Link>
 					</p>
+					<p className="mt-2">
+						<Link to="/forgot-password">
+							<u>Forgot password?</u>
+						</Link>
+					</p>
 				</div>
 			</div>
 		</div>

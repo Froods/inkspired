@@ -43,6 +43,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			if (event === 'SIGNED_IN' && location.pathname === '/login') {
 				navigate('/');
 			}
+
+			if (event === 'PASSWORD_RECOVERY') {
+				navigate('/reset-password');
+			}
 		});
 
 		return () => subscription.unsubscribe();
