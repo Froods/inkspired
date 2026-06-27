@@ -36,7 +36,7 @@ export default function SignUp() {
 	return (
 		<div className="min-h-screen bg-white flex flex-col items-center justify-center relative px-6 py-12 font-sans">
 			{/* Logo */}
-			<div className="absolute top-8 w-full text-center sm:text-left sm:left-8">
+			<div className="absolute top-8 w-full sm:w-auto text-center sm:text-left sm:left-8">
 				<a href="/">
 					<h1 className="text-2xl font-bold text-black tracking-tight">
 						Inkspired
