@@ -3,18 +3,33 @@
 import { useState } from 'react';
 import { useAuth } from '@/AuthContext';
 import { Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function SignUp() {
 	const { supabase } = useAuth();
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 
 	const handleSignup = async () => {
 		setError(null);
+
+		if (password !== confirmPassword) {
+			setError('Passwords do not match.');
+			return;
+		}
+
+		if (password.length < 6) {
+			setError('Password must be at least 6 characters long.');
+			return;
+		}
+
 		setLoading(true);
 
 		const { data, error } = await supabase.auth.signUp({ email, password });
@@ -65,14 +80,41 @@ export default function SignUp() {
 							className="w-full px-6 py-[1.1rem] border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
 						/>
 
-						<input
-							type="password"
-							name="Password"
-							placeholder="Password"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							className="w-full px-6 py-[1.1rem] border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
-						/>
+						<div className="relative w-full">
+							<input
+								type={showPassword ? 'text' : 'password'}
+								name="Password"
+								placeholder="Password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								className="w-full px-6 py-[1.1rem] pr-14 border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
+							/>
+							<button
+								type="button"
+								onClick={() => setShowPassword(!showPassword)}
+								className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+							>
+								{showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+							</button>
+						</div>
+
+						<div className="relative w-full">
+							<input
+								type={showConfirmPassword ? 'text' : 'password'}
+								name="ConfirmPassword"
+								placeholder="Confirm Password"
+								value={confirmPassword}
+								onChange={(e) => setConfirmPassword(e.target.value)}
+								className="w-full px-6 py-[1.1rem] pr-14 border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
+							/>
+							<button
+								type="button"
+								onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+								className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+							>
+								{showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+							</button>
+						</div>
 
 						<button
 							onClick={handleSignup}

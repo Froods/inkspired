@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
 	const { supabase } = useAuth();
@@ -11,6 +12,7 @@ export default function Login() {
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 
@@ -65,14 +67,23 @@ export default function Login() {
 						className="w-full px-6 py-[1.1rem] border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
 					/>
 
-					<input
-						type="password"
-						name="Password"
-						placeholder="Password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						className="w-full px-6 py-[1.1rem] border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
-					/>
+					<div className="relative w-full">
+						<input
+							type={showPassword ? 'text' : 'password'}
+							name="Password"
+							placeholder="Password"
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							className="w-full px-6 py-[1.1rem] pr-14 border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
+						/>
+						<button
+							type="button"
+							onClick={() => setShowPassword(!showPassword)}
+							className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+						>
+							{showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+						</button>
+					</div>
 
 					<button
 						onClick={handleLogin}
