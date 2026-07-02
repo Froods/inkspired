@@ -1,23 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/AuthContext';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 
-export default function SignUp() {
+export default function ResetPassword() {
 	const { supabase } = useAuth();
+	const navigate = useNavigate();
 
-	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 
-	const handleSignup = async () => {
+	useEffect(() => {
+		let timeoutId: ReturnType<typeof setTimeout>;
+		if (success) {
+			timeoutId = setTimeout(() => {
+				navigate('/login');
+			}, 2500);
+		}
+		return () => {
+			if (timeoutId) clearTimeout(timeoutId);
+		};
+	}, [success, navigate]);
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
 		setError(null);
 
 		if (password !== confirmPassword) {
@@ -32,17 +46,14 @@ export default function SignUp() {
 
 		setLoading(true);
 
-		const { data, error } = await supabase.auth.signUp({ email, password });
+		const { error } = await supabase.auth.updateUser({
+			password: password,
+		});
 
 		setLoading(false);
 
-		if (error?.message === 'Unable to validate email address: invalid format') {
-			setError('Invalid email address.');
-		} else if (error) {
+		if (error) {
 			setError(error.message);
-		} else if (data.user?.identities?.length === 0) {
-			// ^ This checks for if an account already exists with the given email
-			setError('An account with this email already exists.');
 		} else {
 			setSuccess(true);
 		}
@@ -62,29 +73,24 @@ export default function SignUp() {
 			{/* Content */}
 			<div className="w-full max-w-[400px] mt-16 sm:mt-0 text-center">
 				<h2 className="text-[2.25rem] font-medium text-[#111111] mb-3">
-					{success ? 'Check your inbox' : 'Sign up with email'}
+					{success ? 'Success!' : 'Set new password'}
 				</h2>
 				<p className="text-[1.05rem] text-[#555555] mb-8 leading-relaxed">
 					{success
-						? 'A verification link has been sent via email.'
-						: "Enter an email and password, and you'll receive a verification link in your inbox."}
+						? 'Your password has been updated. Redirecting to login page...'
+						: 'Please enter and confirm your new password below.'}
 				</p>
-				{!success && (
-					<form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-						<input
-							type="email"
-							name="Email"
-							placeholder="Email"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							className="w-full px-6 py-[1.1rem] border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
-						/>
 
+				{!success && (
+					<form className="space-y-5" onSubmit={handleSubmit}>
 						<div className="relative w-full">
 							<input
 								type={showPassword ? 'text' : 'password'}
-								name="Password"
-								placeholder="Password"
+								id="password"
+								name="password"
+								placeholder="New password"
+								autoComplete="new-password"
+								required
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								className="w-full px-6 py-[1.1rem] pr-14 border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
@@ -101,8 +107,11 @@ export default function SignUp() {
 						<div className="relative w-full">
 							<input
 								type={showConfirmPassword ? 'text' : 'password'}
-								name="ConfirmPassword"
-								placeholder="Confirm Password"
+								id="confirm-password"
+								name="confirm-password"
+								placeholder="Confirm password"
+								autoComplete="new-password"
+								required
 								value={confirmPassword}
 								onChange={(e) => setConfirmPassword(e.target.value)}
 								className="w-full px-6 py-[1.1rem] pr-14 border border-gray-300 rounded-full text-lg placeholder:text-gray-500 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-colors"
@@ -117,33 +126,30 @@ export default function SignUp() {
 						</div>
 
 						<button
-							onClick={handleSignup}
 							disabled={loading}
 							type="submit"
-							className="w-full py-[1.1rem] px-6 bg-[#111111] hover:bg-black text-white text-lg font-medium rounded-full transition-colors"
+							className="w-full py-[1.1rem] px-6 bg-[#111111] hover:bg-black text-white text-lg font-medium rounded-full transition-colors disabled:opacity-55"
 						>
-							Sign up
+							{loading ? 'Saving...' : 'Update password'}
 						</button>
 					</form>
 				)}
-				{!success && (
-					<div className="pt-3">
-						{error && (
-							<p
-								className="text-[1.05rem] text-[#555555] leading-relaxed"
-								style={{ color: 'red' }}
-							>
-								{error}
-							</p>
-						)}
-						<p>
-							Already have an account?<span> </span>
-							<Link to="/login">
-								<u>Sign in</u>
-							</Link>
+
+				<div className="pt-5">
+					{error && (
+						<p
+							className="text-[1.05rem] leading-relaxed mb-4"
+							style={{ color: 'red' }}
+						>
+							{error}
 						</p>
-					</div>
-				)}
+					)}
+					<p>
+						<Link to="/login">
+							<u>Back to login</u>
+						</Link>
+					</p>
+				</div>
 			</div>
 		</div>
 	);
