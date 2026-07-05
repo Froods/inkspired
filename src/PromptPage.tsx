@@ -238,14 +238,7 @@ export default function PromptPage() {
 						>
 							<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
 								<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
-									Your Next
-								</span>
-								<br />
-								<span className="bg-clip-text text-transparent bg-gradient-to-b from-black to-black/60">
-									<span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-500/75 to-blue-500">
-										Unique
-									</span>{' '}
-									Tattoo
+									Design Your Next Tattoo
 								</span>
 							</h1>
 						</motion.div>

@@ -503,7 +503,7 @@ export default function Gallery() {
 											);
 										}}
 										disabled={downloadingId === selectedImage.id}
-										className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-blue-500 to-blue-500/90 text-white hover:from-blue-600 hover:to-blue-600/90 rounded-full text-sm font-semibold transition-all shadow-lg shadow-blue-500/15 active:scale-[0.98] mt-6 shrink-0"
+										className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r bg-black text-white hover:bg-black/85 rounded-full text-sm font-semibold transition-all shadow-lg shadow-blue-500/15 active:scale-[0.98] mt-6 shrink-0"
 									>
 										{downloadingId === selectedImage.id ? (
 											<>

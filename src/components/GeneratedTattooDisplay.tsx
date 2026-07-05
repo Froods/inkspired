@@ -84,12 +84,12 @@ export default function GeneratedTattooDisplay({
 							alt="Generated Tattoo"
 							className="w-full h-auto object-cover"
 						/>
-						{/* Optional: Download Button Overlay */}
-						<div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+						{/* Download Button Overlay */}
+						<div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 							<a
 								href={`${imageStatus}`}
 								download="inkspired-tattoo.png"
-								className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 shadow-lg rounded-full font-medium transition-all transform hover:scale-105"
+								className="px-6 py-2.5 bg-gradient-to-r bg-black text-white hover:bg-black/85 shadow-lg rounded-full font-medium transition-all transform hover:scale-105"
 							>
 								Download Design
 							</a>
