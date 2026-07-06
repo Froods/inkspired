@@ -137,7 +137,8 @@ export default function PromptPage() {
 	const [error, setError] = useState<string | null>(null); // For errors
 	const [showModal, setShowModal] = useState(false); // For showing modal
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-	const { supabase } = useAuth();
+	const { supabase, claims } = useAuth();
+	const signedIn: boolean = !!claims;
 	/// Functions
 	// Generate image from prompt
 	async function genInBackend([tatPrompt, style]: TattooPair) {
@@ -221,11 +222,19 @@ export default function PromptPage() {
 							initial="hidden"
 							animate="visible"
 						>
-							<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
-								<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
-									Your Next Unique Tattoo
-								</span>
-							</h1>
+							{signedIn ? (
+								<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
+									<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
+										New tattoo idea?
+									</span>
+								</h1>
+							) : (
+								<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
+									<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
+										Your Next Unique Tattoo
+									</span>
+								</h1>
+							)}
 						</motion.div>
 
 						{/* Description Text */}
