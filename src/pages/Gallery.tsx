@@ -352,7 +352,7 @@ export default function Gallery() {
 											key={image.id}
 											variants={itemVariants}
 											onClick={() => setSelectedImage(image)}
-											className="group bg-white border border-black/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-black/15 transition-all duration-300 flex flex-col cursor-pointer"
+											className="group bg-white border border-black/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-black/15 transition-all duration-200 flex flex-col cursor-pointer"
 										>
 											{/* Image Container */}
 											<div className="relative aspect-square overflow-hidden bg-black/[0.02] border-b border-black/5">
@@ -360,14 +360,14 @@ export default function Gallery() {
 													src={imageUrl}
 													alt={image.prompt}
 													loading="lazy"
-													className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+													className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.01]"
 												/>
 
 												{/* Hover Action Overlay */}
-												<div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-4">
+												<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end justify-between p-4">
 													<button
 														type="button"
-														className="p-2.5 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md rounded-full border border-white/20 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300"
+														className="p-2.5 bg-white/20 hover:bg-white/40 text-white  rounded-full border border-white/20 transition-all transform translate-y-2 group-hover:translate-y-0 duration-200"
 														title="Quick View"
 													>
 														<Maximize2 className="w-4 h-4" />
