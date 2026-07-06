@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Send, Mic, Image as ImageIcon, Paintbrush } from 'lucide-react';
+import { Send, Paintbrush } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
