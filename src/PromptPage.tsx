@@ -108,21 +108,6 @@ function PromptInput({
 							selectedStyle={selectedStyle}
 							onSelect={setSelectedStyle}
 						/>
-
-						<button
-							type="button"
-							className="flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:text-black hover:bg-black/10 transition-all"
-							aria-label="Upload Image"
-						>
-							<ImageIcon className="h-5 w-5" />
-						</button>
-						<button
-							type="button"
-							className="flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:text-black hover:bg-black/10 transition-all"
-							aria-label="Use Microphone"
-						>
-							<Mic className="h-5 w-5" />
-						</button>
 					</div>
 
 					<button
@@ -238,7 +223,7 @@ export default function PromptPage() {
 						>
 							<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
 								<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
-									Design Your Next Tattoo
+									Your Next Unique Tattoo
 								</span>
 							</h1>
 						</motion.div>

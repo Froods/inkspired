@@ -18,7 +18,11 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 	const location = useLocation();
 
 	const userMetadata = claims?.user_metadata as Record<string, any> | undefined;
-	const displayName = (userMetadata?.display_name || userMetadata?.full_name || '').trim();
+	const displayName = (
+		userMetadata?.display_name ||
+		userMetadata?.full_name ||
+		''
+	).trim();
 
 	// Close dropdown when clicking outside
 	useEffect(() => {
@@ -89,14 +93,19 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 				<Link
 					to="/"
 					className={cn(
-						'flex items-center w-full p-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
+						'flex items-center w-full py-3 pl-[17px] pr-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
 						location.pathname === '/'
 							? 'bg-blue-50 text-blue-600'
-							: 'text-black/60 hover:text-black hover:bg-black/5'
+							: 'text-black/60 hover:text-black hover:bg-black/5',
 					)}
 					title="Create Stencil"
 				>
-					<Paintbrush className={cn('h-5 w-5 shrink-0', location.pathname === '/' ? 'text-blue-600' : 'text-black/60')} />
+					<Paintbrush
+						className={cn(
+							'h-5 w-5 shrink-0',
+							location.pathname === '/' ? 'text-blue-600' : 'text-black/60',
+						)}
+					/>
 					<AnimatePresence>
 						{isExpanded && (
 							<motion.span
@@ -118,14 +127,21 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 				<Link
 					to="/gallery"
 					className={cn(
-						'flex items-center w-full p-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
+						'flex items-center w-full py-3 pl-[17px] pr-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
 						location.pathname === '/gallery'
 							? 'bg-blue-50 text-blue-600'
-							: 'text-black/60 hover:text-black hover:bg-black/5'
+							: 'text-black/60 hover:text-black hover:bg-black/5',
 					)}
 					title="My Gallery"
 				>
-					<Image className={cn('h-5 w-5 shrink-0', location.pathname === '/gallery' ? 'text-blue-600' : 'text-black/60')} />
+					<Image
+						className={cn(
+							'h-5 w-5 shrink-0',
+							location.pathname === '/gallery'
+								? 'text-blue-600'
+								: 'text-black/60',
+						)}
+					/>
 					<AnimatePresence>
 						{isExpanded && (
 							<motion.span
@@ -163,7 +179,10 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 								<p className="text-[10px] font-bold text-black/40 uppercase tracking-widest">
 									{displayName ? 'Logged in as' : 'Status'}
 								</p>
-								<p className="text-xs font-semibold text-black mt-0.5 truncate" title={displayName || 'Signed in'}>
+								<p
+									className="text-xs font-semibold text-black mt-0.5 truncate"
+									title={displayName || 'Signed in'}
+								>
 									{displayName || 'Signed in'}
 								</p>
 							</div>
