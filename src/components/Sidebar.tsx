@@ -17,6 +17,13 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const location = useLocation();
 
+	const userMetadata = claims?.user_metadata as Record<string, any> | undefined;
+	const displayName = (
+		userMetadata?.display_name ||
+		userMetadata?.full_name ||
+		''
+	).trim();
+
 	// Close dropdown when clicking outside
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -48,7 +55,7 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 		<motion.div
 			animate={{ width: isExpanded ? 260 : 88 }}
 			transition={{ duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
-			className="absolute top-0 left-0 h-full bg-white/60 backdrop-blur-xl border-r border-black/10 z-50 flex flex-col py-6 shadow-sm overflow-visible"
+			className="fixed top-0 left-0 h-screen bg-white/60 backdrop-blur-xl border-r border-black/10 z-50 flex flex-col py-6 shadow-sm overflow-visible"
 		>
 			{/* Top Logo / Toggle */}
 			<div className="flex items-center px-4 h-16">
@@ -86,14 +93,19 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 				<Link
 					to="/"
 					className={cn(
-						'flex items-center w-full p-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
+						'flex items-center w-full py-3 pl-[17px] pr-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
 						location.pathname === '/'
 							? 'bg-blue-50 text-blue-600'
-							: 'text-black/60 hover:text-black hover:bg-black/5'
+							: 'text-black/60 hover:text-black hover:bg-black/5',
 					)}
 					title="Create Stencil"
 				>
-					<Paintbrush className={cn('h-5 w-5 shrink-0', location.pathname === '/' ? 'text-blue-600' : 'text-black/60')} />
+					<Paintbrush
+						className={cn(
+							'h-5 w-5 shrink-0',
+							location.pathname === '/' ? 'text-blue-600' : 'text-black/60',
+						)}
+					/>
 					<AnimatePresence>
 						{isExpanded && (
 							<motion.span
@@ -115,14 +127,21 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 				<Link
 					to="/gallery"
 					className={cn(
-						'flex items-center w-full p-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
+						'flex items-center w-full py-3 pl-[17px] pr-3 rounded-2xl transition-all gap-3 justify-start font-medium text-sm',
 						location.pathname === '/gallery'
 							? 'bg-blue-50 text-blue-600'
-							: 'text-black/60 hover:text-black hover:bg-black/5'
+							: 'text-black/60 hover:text-black hover:bg-black/5',
 					)}
 					title="My Gallery"
 				>
-					<Image className={cn('h-5 w-5 shrink-0', location.pathname === '/gallery' ? 'text-blue-600' : 'text-black/60')} />
+					<Image
+						className={cn(
+							'h-5 w-5 shrink-0',
+							location.pathname === '/gallery'
+								? 'text-blue-600'
+								: 'text-black/60',
+						)}
+					/>
 					<AnimatePresence>
 						{isExpanded && (
 							<motion.span
@@ -156,6 +175,25 @@ export default function Sidebar({ onLoginClick }: SidebarProps) {
 								isExpanded ? 'w-[calc(100%-2rem)]' : 'w-48',
 							)}
 						>
+							<div className="px-4 py-3 border-b border-black/5 bg-black/[0.01]">
+								<p className="text-[10px] font-bold text-black/40 uppercase tracking-widest">
+									{displayName ? 'Logged in as' : 'Status'}
+								</p>
+								<p
+									className="text-xs font-semibold text-black mt-0.5 truncate"
+									title={displayName || 'Signed in'}
+								>
+									{displayName || 'Signed in'}
+								</p>
+							</div>
+							<Link
+								to="/profile"
+								onClick={() => setIsDropdownOpen(false)}
+								className="flex items-center gap-3 px-4 py-3 hover:bg-black/5 transition-colors text-black/80 font-medium text-sm text-left border-b border-black/5"
+							>
+								<User className="h-4 w-4" />
+								My Profile
+							</Link>
 							<button
 								onClick={handleLogout}
 								className="flex items-center gap-3 px-4 py-3 hover:bg-black/5 transition-colors text-black/80 font-medium text-sm text-left"
