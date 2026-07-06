@@ -4,12 +4,12 @@ import { motion } from 'framer-motion';
 import { Send, Mic, Image as ImageIcon, Paintbrush } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { ElegantShape } from '@/components/ElegantShape';
 import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
 import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
 import LoginModal from './components/LoginModal';
 import Sidebar from './components/Sidebar';
 import { useAuth } from './AuthContext';
+import Background from '@/components/Background';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 type TattooPair = [string, TattooStyle];
@@ -108,21 +108,6 @@ function PromptInput({
 							selectedStyle={selectedStyle}
 							onSelect={setSelectedStyle}
 						/>
-
-						<button
-							type="button"
-							className="flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:text-black hover:bg-black/10 transition-all"
-							aria-label="Upload Image"
-						>
-							<ImageIcon className="h-5 w-5" />
-						</button>
-						<button
-							type="button"
-							className="flex h-9 w-9 items-center justify-center rounded-full text-black/60 hover:text-black hover:bg-black/10 transition-all"
-							aria-label="Use Microphone"
-						>
-							<Mic className="h-5 w-5" />
-						</button>
 					</div>
 
 					<button
@@ -152,7 +137,8 @@ export default function PromptPage() {
 	const [error, setError] = useState<string | null>(null); // For errors
 	const [showModal, setShowModal] = useState(false); // For showing modal
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-	const { supabase } = useAuth();
+	const { supabase, claims } = useAuth();
+	const signedIn: boolean = !!claims;
 	/// Functions
 	// Generate image from prompt
 	async function genInBackend([tatPrompt, style]: TattooPair) {
@@ -220,142 +206,94 @@ export default function PromptPage() {
 	};
 
 	return (
-		<div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-white">
-			<Sidebar onLoginClick={() => setIsLoginModalOpen(true)} />
+		<Background>
+			<div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-transparent">
+				<Sidebar onLoginClick={() => setIsLoginModalOpen(true)} />
 
-			{/* Background Ambient Gradient */}
-			<div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.05] via-transparent to-pink-500/[0.05] blur-3xl" />
+				{/* Main Content Container */}
+				<div className="relative z-10 container mx-auto px-4 md:px-6">
+					<div className="max-w-5xl mx-auto text-center">
+						{/* Header Badge */}
 
-			{/* Floating Background Shapes */}
-			<div className="absolute inset-0 overflow-hidden">
-				<ElegantShape
-					delay={0.3}
-					width={250}
-					height={250}
-					rotate={12}
-					className="left-[-10%] md:left-[2%] top-[15%] md:top-[2%]"
-					illustration={3}
-				/>
+						{/* Main Title */}
+						<motion.div
+							custom={1}
+							variants={fadeUpVariants}
+							initial="hidden"
+							animate="visible"
+						>
+							{signedIn ? (
+								<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
+									<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
+										New tattoo idea?
+									</span>
+								</h1>
+							) : (
+								<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
+									<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
+										Your Next Unique Tattoo
+									</span>
+								</h1>
+							)}
+						</motion.div>
 
-				<ElegantShape
-					delay={0.5}
-					width={250}
-					height={250}
-					rotate={-15}
-					className="right-[50%] md:right-[7%] top-[70%] md:top-[65%]"
-					illustration={1}
-				/>
+						{/* Description Text */}
+						<motion.div
+							custom={2}
+							variants={fadeUpVariants}
+							initial="hidden"
+							animate="visible"
+						>
+							<p className="text-base sm:text-lg md:text-xl text-black/60 mb-12 leading-relaxed font-light tracking-wide max-w-3xl mx-auto px-4">
+								Transform your ideas into unique tattoo designs. Describe your
+								vision, and our AI tattoo generator dreams up custom artwork
+								tailored to your style.
+							</p>
+						</motion.div>
 
-				<ElegantShape
-					delay={0.4}
-					width={220}
-					height={220}
-					rotate={22}
-					className="left-[5%] md:left-[35%] bottom-[5%] md:bottom-[-2%]"
-					illustration={4}
-				/>
+						{/* Interactive Prompt Input */}
+						<motion.div
+							custom={3}
+							variants={fadeUpVariants}
+							initial="hidden"
+							animate="visible"
+						>
+							<PromptInput onSend={genInBackend} />
+						</motion.div>
 
-				<ElegantShape
-					delay={0.6}
-					width={400}
-					height={400}
-					rotate={20}
-					className="right-[15%] md:right-[-3%] top-[10%] md:top-[-8%]"
-					illustration={2}
-				/>
+						{/* Popup with generated tattoo */}
+						<GeneratedTattooDisplay
+							imageStatus={generatedImage}
+							errorStatus={error}
+							loadingStatus={isLoading}
+							isOpen={showModal}
+							onClose={() => setShowModal(false)}
+						/>
 
-				<ElegantShape
-					delay={0.6}
-					width={400}
-					height={400}
-					rotate={-25}
-					className="left-[10%] md:left-[3%] bottom-[10%] md:bottom-[-2%]"
-					illustration={5}
-				/>
-			</div>
+						<LoginModal
+							isOpen={isLoginModalOpen}
+							onClose={() => setIsLoginModalOpen(false)}
+						/>
 
-			{/* Main Content Container */}
-			<div className="relative z-10 container mx-auto px-4 md:px-6">
-				<div className="max-w-5xl mx-auto text-center">
-					{/* Header Badge */}
-
-					{/* Main Title */}
-					<motion.div
-						custom={1}
-						variants={fadeUpVariants}
-						initial="hidden"
-						animate="visible"
-					>
-						<h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
-							<span className="bg-clip-text text-transparent bg-gradient-to-b from-black/60 to-black">
-								Your Next
-							</span>
-							<br />
-							<span className="bg-clip-text text-transparent bg-gradient-to-b from-black to-black/60">
-								<span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-500/75 to-blue-500">
-									Unique
-								</span>{' '}
-								Tattoo
-							</span>
-						</h1>
-					</motion.div>
-
-					{/* Description Text */}
-					<motion.div
-						custom={2}
-						variants={fadeUpVariants}
-						initial="hidden"
-						animate="visible"
-					>
-						<p className="text-base sm:text-lg md:text-xl text-black/60 mb-12 leading-relaxed font-light tracking-wide max-w-3xl mx-auto px-4">
-							Transform your ideas into unique tattoo designs. Describe your
-							vision, and our AI tattoo generator dreams up custom artwork
-							tailored to your style.
-						</p>
-					</motion.div>
-
-					{/* Interactive Prompt Input */}
-					<motion.div
-						custom={3}
-						variants={fadeUpVariants}
-						initial="hidden"
-						animate="visible"
-					>
-						<PromptInput onSend={genInBackend} />
-					</motion.div>
-
-					{/* Popup with generated tattoo */}
-					<GeneratedTattooDisplay
-						imageStatus={generatedImage}
-						errorStatus={error}
-						loadingStatus={isLoading}
-						isOpen={showModal}
-						onClose={() => setShowModal(false)}
-					/>
-
-					<LoginModal
-						isOpen={isLoginModalOpen}
-						onClose={() => setIsLoginModalOpen(false)}
-					/>
-
-					{/* Footer Stats / Trust Indicators */}
-					<motion.div
-						custom={4}
-						variants={fadeUpVariants}
-						initial="hidden"
-						animate="visible"
-						className="mt-12 flex items-center justify-center gap-8 text-sm text-black/60"
-					>
-						<div className="flex items-center gap-2">
-							<div className="w-2 h-2 rounded-full bg-green-500" />
-							<span>100k+ Designs Created</span>
-						</div>
-					</motion.div>
+						{/* Footer Stats / Trust Indicators */}
+						<motion.div
+							custom={4}
+							variants={fadeUpVariants}
+							initial="hidden"
+							animate="visible"
+							className="mt-12 flex items-center justify-center gap-8 text-sm text-black/60"
+						>
+							<div className="flex items-center gap-2">
+								<div className="w-2 h-2 rounded-full bg-green-500" />
+								<span>100k+ Designs Created</span>
+							</div>
+						</motion.div>
+					</div>
 				</div>
-			</div>
 
-			{/* Bottom Overlay for depth */}
-			<div className="absolute inset-0 bg-gradient-to-t from-white/50 via-transparent to-white/50 pointer-events-none" />
-		</div>
+				{/* Bottom Overlay for depth */}
+				<div className="absolute inset-0 bg-gradient-to-t from-white/50 via-transparent to-white/50 pointer-events-none" />
+			</div>
+		</Background>
 	);
 }

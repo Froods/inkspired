@@ -48,7 +48,7 @@ export default function GeneratedTattooDisplay({
 			// We remove the 'open' attribute here; the useEffect handles it.
 			// onCancel handles the "Escape" key natively
 			onCancel={onClose}
-			className="flex flex-col bg-gray-600/5 backdrop-blur-xl border border-black/20 fixed inset-0 z-50 m-auto w-full max-w-3xl min-h-[50vh] max-h-[85vh] p-8 rounded-3xl shadow-2xl shadow-black/10 backdrop:bg-transparent transition-all duration-300"
+			className="flex flex-col bg-transparent bg-gradient-to-t from-gray-600/5 to-white/40 backdrop-blur-xl border border-black/20 fixed inset-0 z-50 m-auto w-full max-w-3xl min-h-[50vh] max-h-[85vh] p-8 rounded-3xl shadow-2xl shadow-black/10 backdrop:bg-transparent transition-all duration-300"
 		>
 			<div className="flex flex-row justify-end pr-1 pt-1 absolute top-4 right-4 z-10">
 				<button
@@ -84,12 +84,12 @@ export default function GeneratedTattooDisplay({
 							alt="Generated Tattoo"
 							className="w-full h-auto object-cover"
 						/>
-						{/* Optional: Download Button Overlay */}
-						<div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+						{/* Download Button Overlay */}
+						<div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 							<a
 								href={`${imageStatus}`}
 								download="inkspired-tattoo.png"
-								className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 shadow-lg rounded-full font-medium transition-all transform hover:scale-105"
+								className="px-6 py-2.5 bg-black text-white hover:bg-black/85 shadow-lg rounded-full font-medium transition-all transform hover:scale-105"
 							>
 								Download Design
 							</a>
