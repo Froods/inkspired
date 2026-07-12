@@ -170,13 +170,11 @@ export default function PromptPage() {
 			// Handle Network Errors
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.error || 'Failed to connect to server');
+				throw new Error(errorData.detail || 'Failed to connect to server');
 			}
 
 			// Receive Data
 			const data = await response.json();
-
-			console.log(data);
 
 			if (data.success && data.imageBase64) {
 				setGeneratedImage(data.imageBase64); // Save the Base64 string
