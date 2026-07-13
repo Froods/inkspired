@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import GeneratedTattooDisplay from './components/GeneratedTattooDisplay';
 import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
 import LoginModal from './components/LoginModal';
+import PricingModal from './components/PricingModal';
 import Sidebar from './components/Sidebar';
 import { useAuth } from './AuthContext';
 import Background from '@/components/Background';
@@ -137,6 +138,7 @@ export default function PromptPage() {
 	const [error, setError] = useState<string | null>(null); // For errors
 	const [showModal, setShowModal] = useState(false); // For showing modal
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+	const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
 	const { supabase, claims } = useAuth();
 	const signedIn: boolean = !!claims;
 	/// Functions
@@ -144,10 +146,49 @@ export default function PromptPage() {
 	async function genInBackend([tatPrompt, style]: TattooPair) {
 		setIsLoading(true);
 		setError(null);
-		setGeneratedImage(null); // Clear previous image
-		setShowModal(true); // Show modal
 
 		try {
+			// 1. Get user details to check authentication status
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+
+			if (!user) {
+				setIsLoginModalOpen(true);
+				setIsLoading(false);
+				return;
+			}
+
+			// 2. Query the profiles table to verify subscription/has_access status
+			const { data: profile, error: profileError } = await supabase
+				.from('profiles')
+				.select('has_access')
+				.eq('user_id', user.id)
+				.setHeader('Cache-Control', 'no-cache')
+				.maybeSingle();
+
+			console.log('Current logged-in user ID:', user.id);
+			console.log('Subscription check response:', { profile, error: profileError });
+
+			if (profileError) {
+				console.error('Error fetching user profile:', profileError);
+				setError('Failed to verify subscription status. Please try again.');
+				setShowModal(true); // Open the modal to show the error
+				setIsLoading(false);
+				return;
+			}
+
+			// If profile row doesn't exist or user doesn't have access, show the pricing modal
+			if (!profile || profile.has_access !== true) {
+				setIsPricingModalOpen(true);
+				setIsLoading(false);
+				return;
+			}
+
+			// 3. User is authenticated and has access, proceed with image generation
+			setGeneratedImage(null);
+			setShowModal(true); // Show the generation progress modal
+
 			console.log(`Sending prompt to backend: ${tatPrompt}`);
 
 			// Get the current session token
@@ -181,9 +222,11 @@ export default function PromptPage() {
 			} else {
 				throw new Error('No image returned from AI');
 			}
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Generation failed:', err);
-			setError(err.message || 'Something went wrong');
+			const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
+			setError(errorMessage);
+			setShowModal(true); // Open the modal to show the error
 		} finally {
 			setIsLoading(false);
 		}
@@ -271,6 +314,11 @@ export default function PromptPage() {
 						<LoginModal
 							isOpen={isLoginModalOpen}
 							onClose={() => setIsLoginModalOpen(false)}
+						/>
+
+						<PricingModal
+							isOpen={isPricingModalOpen}
+							onClose={() => setIsPricingModalOpen(false)}
 						/>
 
 						{/* Footer Stats / Trust Indicators */}
