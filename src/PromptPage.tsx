@@ -162,13 +162,16 @@ export default function PromptPage() {
 			// 2. Query the profiles table to verify subscription/has_access status
 			const { data: profile, error: profileError } = await supabase
 				.from('profiles')
-				.select('has_access')
+				.select('has_access, credits')
 				.eq('user_id', user.id)
 				.setHeader('Cache-Control', 'no-cache')
 				.maybeSingle();
 
 			console.log('Current logged-in user ID:', user.id);
-			console.log('Subscription check response:', { profile, error: profileError });
+			console.log('Subscription check response:', {
+				profile,
+				error: profileError,
+			});
 
 			if (profileError) {
 				console.error('Error fetching user profile:', profileError);
@@ -178,8 +181,18 @@ export default function PromptPage() {
 				return;
 			}
 
-			// If profile row doesn't exist or user doesn't have access, show the pricing modal
-			if (!profile || profile.has_access !== true) {
+			// If profile row doesn't exist (unexpected database anomaly)
+			if (!profile) {
+				setError(
+					'Account details could not be found. Please contact: noreply@inkspired-ai.com',
+				);
+				setShowModal(true); // Open the modal to show the error
+				setIsLoading(false);
+				return;
+			}
+
+			// If user doesn't have access, show the pricing modal
+			if (profile.has_access !== true && profile.credits <= 0) {
 				setIsPricingModalOpen(true);
 				setIsLoading(false);
 				return;
@@ -224,7 +237,8 @@ export default function PromptPage() {
 			}
 		} catch (err: unknown) {
 			console.error('Generation failed:', err);
-			const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
+			const errorMessage =
+				err instanceof Error ? err.message : 'Something went wrong';
 			setError(errorMessage);
 			setShowModal(true); // Open the modal to show the error
 		} finally {
