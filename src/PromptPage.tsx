@@ -9,6 +9,7 @@ import StyleDropdown, { type TattooStyle } from '@/components/StyleDropdown';
 import LoginModal from './components/LoginModal';
 import PricingModal from './components/PricingModal';
 import Sidebar from './components/Sidebar';
+import CreditsContainer from './components/CreditsContainer';
 import { useAuth } from './AuthContext';
 import Background from '@/components/Background';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -139,8 +140,49 @@ export default function PromptPage() {
 	const [showModal, setShowModal] = useState(false); // For showing modal
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 	const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+	const [profileData, setProfileData] = useState<{
+		has_access: boolean;
+		credits: number;
+	} | null>(null);
 	const { supabase, claims } = useAuth();
 	const signedIn: boolean = !!claims;
+
+	// Fetch the profile state when the component mounts or claims change
+	useEffect(() => {
+		if (!claims) {
+			setProfileData(null);
+			return;
+		}
+
+		async function fetchProfile() {
+			try {
+				const {
+					data: { user },
+				} = await supabase.auth.getUser();
+				if (!user) return;
+
+				const { data, error: profileError } = await supabase
+					.from('profiles')
+					.select('has_access, credits')
+					.eq('user_id', user.id)
+					.setHeader('Cache-Control', 'no-cache')
+					.maybeSingle();
+
+				if (profileError) {
+					console.error('Error fetching user profile:', profileError);
+					return;
+				}
+
+				if (data) {
+					setProfileData(data);
+				}
+			} catch (err) {
+				console.error('Failed to load profile on mount:', err);
+			}
+		}
+
+		fetchProfile();
+	}, [claims, supabase]);
 	/// Functions
 	// Generate image from prompt
 	async function genInBackend([tatPrompt, style]: TattooPair) {
@@ -232,6 +274,18 @@ export default function PromptPage() {
 
 			if (data.success && data.imageBase64) {
 				setGeneratedImage(data.imageBase64); // Save the Base64 string
+
+				// Sync updated credits state after a successful generation
+				const { data: updatedProfile } = await supabase
+					.from('profiles')
+					.select('has_access, credits')
+					.eq('user_id', user.id)
+					.setHeader('Cache-Control', 'no-cache')
+					.maybeSingle();
+
+				if (updatedProfile) {
+					setProfileData(updatedProfile);
+				}
 			} else {
 				throw new Error('No image returned from AI');
 			}
@@ -264,6 +318,13 @@ export default function PromptPage() {
 		<Background>
 			<div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-transparent">
 				<Sidebar onLoginClick={() => setIsLoginModalOpen(true)} />
+
+				{/* Top-Center Credits Container for non-paying users */}
+				{signedIn && profileData && profileData.has_access === false && (
+					<div className="absolute top-6 left-1/2 -translate-x-1/2 z-40">
+						<CreditsContainer credits={profileData.credits} />
+					</div>
+				)}
 
 				{/* Main Content Container */}
 				<div className="relative z-10 container mx-auto px-4 md:px-6">
