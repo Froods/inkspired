@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 
 // Typen for claims-objektet fra Supabase
 interface Claims {

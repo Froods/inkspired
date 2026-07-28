@@ -3,7 +3,7 @@
 import { X, Mail } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useAuth } from '@/AuthContext';
 
 export default function LoginModal({
