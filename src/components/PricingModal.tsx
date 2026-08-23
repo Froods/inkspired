@@ -3,6 +3,7 @@
 import { X, Check, Sparkles, Zap, Flame, ArrowLeft } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { PlanCheckoutModal } from '@/PlanCheckoutModal';
 
 type contentType = 'default' | 'weekly' | 'monthly' | 'annual';
 
@@ -73,7 +74,7 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
 					<motion.button onClick={() => setContent('default')}>
 						<ArrowLeft className="w-4 h-4 text-black/60 transition-transform duration-200 ease-out group-hover:text-black hover:scale-110" />
 					</motion.button>
-					<p>Test</p>
+					<PlanCheckoutModal plan={content}></PlanCheckoutModal>
 				</>
 			)}
 		</motion.dialog>
@@ -281,3 +282,7 @@ function DefaultContent({ toWeekly, toMonthly, toAnnual }: ListButtons) {
 		</div>
 	);
 }
+
+// Payment page: weekly
+
+function WeeklySubscriptionPage() {}
