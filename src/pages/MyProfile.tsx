@@ -20,6 +20,7 @@ import { useAuth } from '@/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import LoginModal from '@/components/LoginModal';
 import Background from '@/components/Background';
+import SubscriptionRedirectModal from '@/components/SubscriptionRedirectModal';
 
 export default function MyProfile() {
 	const { claims, supabase } = useAuth();
@@ -56,6 +57,10 @@ export default function MyProfile() {
 
 	// Login Modal State for logged-out view
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+	// Subscription Modal State
+	const [isSubModalOpen, setIsSubModalOpen] = useState(false);
+	const [subError, setSubError] = useState<string | null>(null);
 
 	// Fetch latest user data from Supabase Auth
 	useEffect(() => {
@@ -174,12 +179,16 @@ export default function MyProfile() {
 
 	// Handler: Manage Subscription
 	const handleManageSub = async () => {
+		setSubError(null);
+		setIsSubModalOpen(true);
+
 		const { error, data } = await supabase.functions.invoke(
 			'create-portal-session',
 		);
 
 		if (error || !data?.url) {
 			console.log(error);
+			setSubError('Failed to redirect to subscriptions page');
 			return;
 		}
 
@@ -663,6 +672,13 @@ export default function MyProfile() {
 				<LoginModal
 					isOpen={isLoginModalOpen}
 					onClose={() => setIsLoginModalOpen(false)}
+				/>
+
+				{/* Subscription redirect modal */}
+				<SubscriptionRedirectModal
+					isOpen={isSubModalOpen}
+					error={subError}
+					onErrorDismiss={() => setIsSubModalOpen(false)}
 				/>
 			</div>
 		</Background>
