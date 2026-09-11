@@ -21,6 +21,7 @@ import Sidebar from '@/components/Sidebar';
 import LoginModal from '@/components/LoginModal';
 import Background from '@/components/Background';
 import SubscriptionRedirectModal from '@/components/SubscriptionRedirectModal';
+import PricingModal from '@/components/PricingModal';
 
 export default function MyProfile() {
 	const { claims, supabase } = useAuth();
@@ -62,6 +63,10 @@ export default function MyProfile() {
 	const [isSubModalOpen, setIsSubModalOpen] = useState(false);
 	const [subError, setSubError] = useState<string | null>(null);
 
+	// Pricing Modal & Profile State
+	const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+	const [hasAccess, setHasAccess] = useState(false);
+
 	// Fetch latest user data from Supabase Auth
 	useEffect(() => {
 		if (!claims) {
@@ -84,6 +89,17 @@ export default function MyProfile() {
 							user.user_metadata?.full_name ||
 							'',
 					);
+
+					// Fetch profile to check has_access
+					const { data: profile } = await supabase
+						.from('profiles')
+						.select('has_access')
+						.eq('user_id', user.id)
+						.single();
+
+					if (profile) {
+						setHasAccess(profile.has_access);
+					}
 				}
 			} catch (err) {
 				console.error('Error fetching user metadata:', err);
@@ -517,19 +533,24 @@ export default function MyProfile() {
 									<div className="border border-black/10 bg-white/50 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-5">
 										<div className="space-y-1 max-w-md">
 											<h3 className="text-sm font-bold text-black">
-												Manage Subscription
+												{hasAccess ? 'Manage Subscription' : 'Upgrade to Pro'}
 											</h3>
 											<p className="text-xs text-black/50 leading-relaxed font-light">
-												View your current plan, update billing information, or
-												cancel your subscription.
+												{hasAccess
+													? 'View your current plan, update billing information, or cancel your subscription.'
+													: 'Unlock premium features, faster generation speeds, and higher limits by upgrading your plan.'}
 											</p>
 										</div>
 										<button
 											type="button"
-											onClick={handleManageSub}
+											onClick={
+												hasAccess
+													? handleManageSub
+													: () => setIsPricingModalOpen(true)
+											}
 											className="px-5 py-3 bg-black hover:bg-black/85 text-white rounded-full text-xs font-semibold transition-all active:scale-[0.98] shrink-0 self-start md:self-auto"
 										>
-											Manage Subscription
+											{hasAccess ? 'Manage Subscription' : 'View Plans'}
 										</button>
 									</div>
 								</div>
@@ -679,6 +700,12 @@ export default function MyProfile() {
 					isOpen={isSubModalOpen}
 					error={subError}
 					onErrorDismiss={() => setIsSubModalOpen(false)}
+				/>
+
+				{/* Pricing Modal */}
+				<PricingModal
+					isOpen={isPricingModalOpen}
+					onClose={() => setIsPricingModalOpen(false)}
 				/>
 			</div>
 		</Background>
