@@ -13,6 +13,7 @@ import {
 	X,
 	ArrowRight,
 	Mail,
+	CreditCard,
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '@/AuthContext';
@@ -169,6 +170,20 @@ export default function MyProfile() {
 		} finally {
 			setIsSavingPassword(false);
 		}
+	};
+
+	// Handler: Manage Subscription
+	const handleManageSub = async () => {
+		const { error, data } = await supabase.functions.invoke(
+			'create-portal-session',
+		);
+
+		if (error || !data?.url) {
+			console.log(error);
+			return;
+		}
+
+		window.location.href = data.url;
 	};
 
 	// Handler: Delete Account
@@ -480,6 +495,35 @@ export default function MyProfile() {
 										</button>
 									</div>
 								</form>
+
+								{/* Subscription Management */}
+								<div className="pt-6 border-t border-black/5 space-y-4">
+									<div className="flex items-center gap-2 border-b border-black/5 pb-3">
+										<CreditCard className="w-5 h-5 text-black/60" />
+										<h2 className="text-lg font-semibold text-black">
+											Subscription
+										</h2>
+									</div>
+
+									<div className="border border-black/10 bg-white/50 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-5">
+										<div className="space-y-1 max-w-md">
+											<h3 className="text-sm font-bold text-black">
+												Manage Subscription
+											</h3>
+											<p className="text-xs text-black/50 leading-relaxed font-light">
+												View your current plan, update billing information, or
+												cancel your subscription.
+											</p>
+										</div>
+										<button
+											type="button"
+											onClick={handleManageSub}
+											className="px-5 py-3 bg-black hover:bg-black/85 text-white rounded-full text-xs font-semibold transition-all active:scale-[0.98] shrink-0 self-start md:self-auto"
+										>
+											Manage Subscription
+										</button>
+									</div>
+								</div>
 
 								{/* Danger Zone: Account Deletion */}
 								<div className="pt-6 border-t border-black/5 space-y-4">
