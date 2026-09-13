@@ -13,12 +13,15 @@ import {
 	X,
 	ArrowRight,
 	Mail,
+	CreditCard,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useAuth } from '@/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import LoginModal from '@/components/LoginModal';
 import Background from '@/components/Background';
+import SubscriptionRedirectModal from '@/components/SubscriptionRedirectModal';
+import PricingModal from '@/components/PricingModal';
 
 export default function MyProfile() {
 	const { claims, supabase } = useAuth();
@@ -56,6 +59,14 @@ export default function MyProfile() {
 	// Login Modal State for logged-out view
 	const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
+	// Subscription Modal State
+	const [isSubModalOpen, setIsSubModalOpen] = useState(false);
+	const [subError, setSubError] = useState<string | null>(null);
+
+	// Pricing Modal & Profile State
+	const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+	const [hasAccess, setHasAccess] = useState(false);
+
 	// Fetch latest user data from Supabase Auth
 	useEffect(() => {
 		if (!claims) {
@@ -78,6 +89,17 @@ export default function MyProfile() {
 							user.user_metadata?.full_name ||
 							'',
 					);
+
+					// Fetch profile to check has_access
+					const { data: profile } = await supabase
+						.from('profiles')
+						.select('has_access')
+						.eq('user_id', user.id)
+						.single();
+
+					if (profile) {
+						setHasAccess(profile.has_access);
+					}
 				}
 			} catch (err) {
 				console.error('Error fetching user metadata:', err);
@@ -171,6 +193,24 @@ export default function MyProfile() {
 		}
 	};
 
+	// Handler: Manage Subscription
+	const handleManageSub = async () => {
+		setSubError(null);
+		setIsSubModalOpen(true);
+
+		const { error, data } = await supabase.functions.invoke(
+			'create-portal-session',
+		);
+
+		if (error || !data?.url) {
+			console.log(error);
+			setSubError('Failed to redirect to subscriptions page');
+			return;
+		}
+
+		window.location.href = data.url;
+	};
+
 	// Handler: Delete Account
 	const handleDeleteAccount = async () => {
 		if (deleteConfirmText.toLowerCase() !== 'delete') return;
@@ -179,40 +219,17 @@ export default function MyProfile() {
 		setDeleteError(null);
 
 		try {
-			// Try to call user self-deletion PostgreSQL function via RPC
-			const { error } = await supabase.rpc('delete_user_account');
-
+			const { error } = await supabase.functions.invoke('delete-account');
 			if (error) throw error;
 
-			// Sign out client-side if delete succeeded
 			await supabase.auth.signOut();
 			setIsDeleteModalOpen(false);
 			navigate('/');
 		} catch (err: any) {
 			console.error('Account deletion error:', err);
-
-			// Custom message for missing RPC function or lacking permission
-			if (
-				err.message?.includes('does not exist') ||
-				err.code === 'P0001' ||
-				err.status === 404 ||
-				err.message?.includes('method not found')
-			) {
-				setDeleteError(
-					"The custom 'delete_user_account' function is not configured in your Supabase database. " +
-						'To enable users to delete their own accounts, execute the following SQL in your Supabase SQL Editor:\n\n' +
-						'CREATE OR REPLACE FUNCTION delete_user_account()\n' +
-						'RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$\n' +
-						'BEGIN\n' +
-						'  DELETE FROM auth.users WHERE id = auth.uid();\n' +
-						'END;\n' +
-						'$$;',
-				);
-			} else {
-				setDeleteError(
-					err.message || 'Failed to delete account. Please try again.',
-				);
-			}
+			setDeleteError(
+				err.message || 'Failed to delete account. Please try again.',
+			);
 		} finally {
 			setIsDeleting(false);
 		}
@@ -481,6 +498,40 @@ export default function MyProfile() {
 									</div>
 								</form>
 
+								{/* Subscription Management */}
+								<div className="pt-6 border-t border-black/5 space-y-4">
+									<div className="flex items-center gap-2 border-b border-black/5 pb-3">
+										<CreditCard className="w-5 h-5 text-black/60" />
+										<h2 className="text-lg font-semibold text-black">
+											Subscription
+										</h2>
+									</div>
+
+									<div className="border border-black/10 bg-white/50 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-5">
+										<div className="space-y-1 max-w-md">
+											<h3 className="text-sm font-bold text-black">
+												{hasAccess ? 'Manage Subscription' : 'Upgrade to Pro'}
+											</h3>
+											<p className="text-xs text-black/50 leading-relaxed font-light">
+												{hasAccess
+													? 'View your current plan, update billing information, or cancel your subscription.'
+													: 'Unlock premium features, faster generation speeds, and higher limits by upgrading your plan.'}
+											</p>
+										</div>
+										<button
+											type="button"
+											onClick={
+												hasAccess
+													? handleManageSub
+													: () => setIsPricingModalOpen(true)
+											}
+											className="px-5 py-3 bg-black hover:bg-black/85 text-white rounded-full text-xs font-semibold transition-all active:scale-[0.98] shrink-0 self-start md:self-auto"
+										>
+											{hasAccess ? 'Manage Subscription' : 'View Plans'}
+										</button>
+									</div>
+								</div>
+
 								{/* Danger Zone: Account Deletion */}
 								<div className="pt-6 border-t border-black/5 space-y-4">
 									<div className="flex items-center gap-2 border-b border-black/5 pb-3">
@@ -556,8 +607,10 @@ export default function MyProfile() {
 										Delete Account Permanently?
 									</h3>
 									<p className="text-xs text-black/65 font-light leading-relaxed">
-										This action cannot be undone. To proceed, please type the
-										word{' '}
+										This action cannot be undone. If you have an active
+										subscription, it will be canceled immediately and you will
+										not be refunded for any remaining time. To proceed, please
+										type the word{' '}
 										<strong className="text-red-700 font-semibold">
 											delete
 										</strong>{' '}
@@ -619,6 +672,19 @@ export default function MyProfile() {
 				<LoginModal
 					isOpen={isLoginModalOpen}
 					onClose={() => setIsLoginModalOpen(false)}
+				/>
+
+				{/* Subscription redirect modal */}
+				<SubscriptionRedirectModal
+					isOpen={isSubModalOpen}
+					error={subError}
+					onErrorDismiss={() => setIsSubModalOpen(false)}
+				/>
+
+				{/* Pricing Modal */}
+				<PricingModal
+					isOpen={isPricingModalOpen}
+					onClose={() => setIsPricingModalOpen(false)}
 				/>
 			</div>
 		</Background>

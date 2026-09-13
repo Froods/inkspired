@@ -3,6 +3,8 @@
 import { X, Check, Sparkles, Zap, Flame, ArrowLeft } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { PlanCheckoutModal } from '@/PlanCheckoutModal';
+import { cn } from '@/lib/utils';
 
 type contentType = 'default' | 'weekly' | 'monthly' | 'annual';
 
@@ -47,7 +49,10 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
 			}}
 			ref={dialogRef}
 			onCancel={handleClose}
-			className="flex flex-col bg-white/95 backdrop-blur-xl border border-black/10 fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-4xl p-6 md:p-10 rounded-3xl shadow-2xl backdrop:bg-black/30 transition-all duration-300 focus:outline-none overflow-y-auto max-h-[90vh]"
+			className={cn(
+				'flex flex-col bg-white/95 backdrop-blur-xl border border-black/10 fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-4xl p-6 md:p-10 rounded-3xl shadow-2xl backdrop:bg-black/30 transition-all duration-300 focus:outline-none overflow-y-auto max-h-[90vh]',
+				content === 'default' ? 'bg-white/95' : 'bg-white',
+			)}
 		>
 			{/* Close Button */}
 			<div className="flex flex-row justify-end absolute top-5 right-5 z-10">
@@ -73,7 +78,7 @@ export default function PricingModal({ isOpen, onClose }: PricingModalProps) {
 					<motion.button onClick={() => setContent('default')}>
 						<ArrowLeft className="w-4 h-4 text-black/60 transition-transform duration-200 ease-out group-hover:text-black hover:scale-110" />
 					</motion.button>
-					<p>Test</p>
+					<PlanCheckoutModal plan={content}></PlanCheckoutModal>
 				</>
 			)}
 		</motion.dialog>

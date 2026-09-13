@@ -14,7 +14,7 @@ import {
 	Image as ImageIcon,
 	Clock,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useAuth } from '@/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import LoginModal from '@/components/LoginModal';
