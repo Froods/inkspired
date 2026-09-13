@@ -219,40 +219,17 @@ export default function MyProfile() {
 		setDeleteError(null);
 
 		try {
-			// Try to call user self-deletion PostgreSQL function via RPC
-			const { error } = await supabase.rpc('delete_user_account');
-
+			const { error } = await supabase.functions.invoke('delete-account');
 			if (error) throw error;
 
-			// Sign out client-side if delete succeeded
 			await supabase.auth.signOut();
 			setIsDeleteModalOpen(false);
 			navigate('/');
 		} catch (err: any) {
 			console.error('Account deletion error:', err);
-
-			// Custom message for missing RPC function or lacking permission
-			if (
-				err.message?.includes('does not exist') ||
-				err.code === 'P0001' ||
-				err.status === 404 ||
-				err.message?.includes('method not found')
-			) {
-				setDeleteError(
-					"The custom 'delete_user_account' function is not configured in your Supabase database. " +
-						'To enable users to delete their own accounts, execute the following SQL in your Supabase SQL Editor:\n\n' +
-						'CREATE OR REPLACE FUNCTION delete_user_account()\n' +
-						'RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$\n' +
-						'BEGIN\n' +
-						'  DELETE FROM auth.users WHERE id = auth.uid();\n' +
-						'END;\n' +
-						'$$;',
-				);
-			} else {
-				setDeleteError(
-					err.message || 'Failed to delete account. Please try again.',
-				);
-			}
+			setDeleteError(
+				err.message || 'Failed to delete account. Please try again.',
+			);
 		} finally {
 			setIsDeleting(false);
 		}
@@ -630,8 +607,10 @@ export default function MyProfile() {
 										Delete Account Permanently?
 									</h3>
 									<p className="text-xs text-black/65 font-light leading-relaxed">
-										This action cannot be undone. To proceed, please type the
-										word{' '}
+										This action cannot be undone. If you have an active
+										subscription, it will be canceled immediately and you will
+										not be refunded for any remaining time. To proceed, please
+										type the word{' '}
 										<strong className="text-red-700 font-semibold">
 											delete
 										</strong>{' '}
