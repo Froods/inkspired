@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { X, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface SubscriptionRedirectModalProps {
 	isOpen: boolean;
@@ -77,7 +77,8 @@ export default function SubscriptionRedirectModal({
 							Redirecting to subscription portal
 						</h2>
 						<p className="text-black/50 text-sm px-2">
-							Please wait while we securely transfer you to our billing provider.
+							Please wait while we securely transfer you to our billing
+							provider.
 						</p>
 					</>
 				)}
