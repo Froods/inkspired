@@ -1,73 +1,91 @@
-# React + TypeScript + Vite
+# Inkspired
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**AI-powered tattoo generation.** Describe the tattoo you have in mind, pick a style (Traditional, Neo-Traditional or Blackwork), and Inkspired generates original artwork for it. Every design is saved to your personal gallery so you can come back to it later.
 
-Currently, two official plugins are available:
+Access requires an account with either an active subscription or remaining credits. Billing is handled through Stripe.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> This repository contains the **frontend only**. Image generation runs on a separate backend service, which this app calls over HTTP.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Prompt-to-tattoo generation** in three styles
+- **Personal gallery** of generated designs, stored in Supabase Storage
+- **Accounts** with sign-up, login, password reset and account deletion
+- **Subscriptions and credits** via Stripe embedded checkout and the Stripe customer portal
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React 19**, **TypeScript**, **Vite 7**
+- **Tailwind CSS** and **framer-motion**, with a Vanta.js / three.js animated background
+- **React Router**
+- **Supabase** for auth, Postgres, storage and edge functions
+- **Stripe** for payments
+- **Vitest** and Testing Library for tests
+- Deployed on **Netlify**
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js and npm
+- A Supabase project with the `profiles` and `generated_images` tables and a `tattoo-images` storage bucket
+- A running instance of the Inkspired generation backend
+- A Stripe account (publishable key)
+
+### Setup
+
+```bash
+npm install
+cp .env.example .env   # then fill in the values below
+npm run dev            # http://localhost:3000
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Environment Variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Variable | Description |
+|---|---|
+| `VITE_SUPABASE_URL` | Your Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable (anon) key |
+| `VITE_BACKEND_URL` | Base URL of the image-generation backend |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+All `VITE_` variables are bundled into the client and are visible to anyone using the site. **Never put secret keys here** — secrets belong in Supabase edge function secrets.
+
+## Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the dev server on port 3000 |
+| `npm run build` | Type-check and build for production into `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run test` | Run tests in watch mode (`npx vitest run` for a single pass) |
+| `npm run lint` | Run ESLint |
+
+## Project Structure
+
 ```
+src/
+├── main.tsx             # Router and app entry point
+├── AuthContext.tsx      # Supabase client and auth state (useAuth hook)
+├── PromptPage.tsx       # Home page: prompt, style picker, generation flow
+├── PlanCheckoutModal.tsx
+├── pages/               # Login, SignUp, Gallery, MyProfile, password reset
+├── components/          # Background, modals, sidebar, result display, etc.
+├── lib/utils.ts         # cn() helper for Tailwind classes
+└── tests/
+supabase/functions/
+└── cleanup-old-images/  # Edge function that deletes expired images
+```
+
+## How Generation Works
+
+1. The user must be logged in; otherwise the login modal opens.
+2. The app checks the user's `profiles` row for an active subscription or remaining credits; if neither, the pricing modal opens.
+3. The prompt and style are sent to `POST {VITE_BACKEND_URL}/generate-tattoo` with the user's Supabase access token.
+4. The returned image is shown in a modal, and the credit count is refreshed (the backend deducts credits).
+
+## Deployment
+
+The site is deployed on Netlify using `netlify.toml`: it runs `npm run build` and publishes `dist/`. Set the environment variables above in the Netlify site settings.
+
+The Supabase edge functions `create-checkout-session`, `create-portal-session` and `delete-account` are called by this app but deployed from a separate repository. Only `cleanup-old-images` lives here.
