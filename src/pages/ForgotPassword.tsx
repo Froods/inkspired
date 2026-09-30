@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export default function ForgotPassword() {
 	const { supabase } = useAuth();

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, LogOut, Paintbrush, Image } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/AuthContext';
 import logo from '@/assets/inkspired-logo-slim.svg';
